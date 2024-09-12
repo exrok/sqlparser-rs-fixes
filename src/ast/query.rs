@@ -23,7 +23,10 @@ use crate::ast::*;
 
 /// The most complete variant of a `SELECT` query expression, optionally
 /// including `WITH`, `UNION` / other set operations, and `ORDER BY`.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 #[cfg_attr(feature = "visitor", visit(with = "visit_query"))]
@@ -103,7 +106,10 @@ impl fmt::Display for Query {
 /// Syntax is `SELECT <COLUMN LIST EXPR> [GROUP BY] [ORDER BY]`
 ///
 /// [ClickHouse](https://clickhouse.com/docs/en/sql-reference/statements/alter/projection#add-projection)
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct ProjectionSelect {
@@ -128,7 +134,10 @@ impl fmt::Display for ProjectionSelect {
 /// A node in a tree, representing a "query body" expression, roughly:
 /// `SELECT ... [ {UNION|EXCEPT|INTERSECT} SELECT ...]`
 #[allow(clippy::large_enum_variant)]
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum SetExpr {
@@ -239,7 +248,10 @@ impl fmt::Display for SetQuantifier {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 /// A [`TABLE` command]( https://www.postgresql.org/docs/current/sql-select.html#SQL-TABLE)
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
@@ -267,7 +279,10 @@ impl fmt::Display for Table {
 /// A restricted variant of `SELECT` (without CTEs/`ORDER BY`), which may
 /// appear either as the only body item of a `Query`, or as an operand
 /// to a set operation like `UNION`.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct Select {
@@ -399,7 +414,10 @@ impl fmt::Display for Select {
 }
 
 /// A hive LATERAL VIEW with potential column aliases
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct LateralView {
@@ -438,7 +456,10 @@ impl fmt::Display for LateralView {
 /// ```sql
 /// WINDOW mywindow AS [named_window_expr]
 /// ```
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum NamedWindowExpr {
@@ -475,7 +496,10 @@ impl fmt::Display for NamedWindowExpr {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct NamedWindowDefinition(pub Ident, pub NamedWindowExpr);
@@ -486,7 +510,10 @@ impl fmt::Display for NamedWindowDefinition {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct With {
@@ -505,7 +532,10 @@ impl fmt::Display for With {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum CteAsMaterialized {
@@ -533,7 +563,10 @@ impl fmt::Display for CteAsMaterialized {
 /// The names in the column list before `AS`, when specified, replace the names
 /// of the columns returned by the query. The parser does not validate that the
 /// number of columns in the query matches the number of columns in the query.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct Cte {
@@ -557,7 +590,10 @@ impl fmt::Display for Cte {
 }
 
 /// One item of the comma-separated list following `SELECT`
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum SelectItem {
@@ -577,7 +613,10 @@ pub enum SelectItem {
 /// ```plaintext
 /// <ident> AS <alias>
 /// ```
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct IdentWithAlias {
@@ -592,7 +631,11 @@ impl fmt::Display for IdentWithAlias {
 }
 
 /// Additional options for wildcards, e.g. Snowflake `EXCLUDE`/`RENAME` and Bigquery `EXCEPT`.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash, Default)]
+#[derive(Default)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct WildcardAdditionalOptions {
@@ -640,7 +683,10 @@ impl fmt::Display for WildcardAdditionalOptions {
 /// ```plaintext
 /// ILIKE <value>
 /// ```
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct IlikeSelectItem {
@@ -664,7 +710,10 @@ impl fmt::Display for IlikeSelectItem {
 /// <col_name>
 /// | (<col_name>, <col_name>, ...)
 /// ```
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum ExcludeSelectItem {
@@ -705,7 +754,10 @@ impl fmt::Display for ExcludeSelectItem {
 /// <col_name> AS <col_alias>
 /// | (<col_name> AS <col_alias>, <col_name> AS <col_alias>, ...)
 /// ```
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum RenameSelectItem {
@@ -745,7 +797,10 @@ impl fmt::Display for RenameSelectItem {
 /// ```plaintext
 /// EXCEPT (<col_name> [, ...])
 /// ```
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct ExceptSelectItem {
@@ -779,7 +834,10 @@ impl fmt::Display for ExceptSelectItem {
 /// REPLACE (<new_expr> [AS] <col_name>)
 /// REPLACE (<col_name> [AS] <col_alias>, <col_name> [AS] <col_alias>, ...)
 /// ```
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct ReplaceSelectItem {
@@ -798,7 +856,10 @@ impl fmt::Display for ReplaceSelectItem {
 /// ```plaintext
 /// <expr> [AS] <column_name>
 /// ```
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct ReplaceSelectElement {
@@ -836,7 +897,10 @@ impl fmt::Display for SelectItem {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct TableWithJoins {
@@ -857,7 +921,10 @@ impl fmt::Display for TableWithJoins {
 /// Joins a table to itself to process hierarchical data in the table.
 ///
 /// See <https://docs.snowflake.com/en/sql-reference/constructs/connect-by>.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct ConnectBy {
@@ -878,7 +945,10 @@ impl fmt::Display for ConnectBy {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct Setting {
@@ -898,7 +968,10 @@ impl fmt::Display for Setting {
 /// ```sql
 /// 42 AS myint
 /// ```
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct ExprWithAlias {
@@ -918,7 +991,10 @@ impl fmt::Display for ExprWithAlias {
 }
 
 /// Arguments to a table-valued function
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct TableFunctionArgs {
@@ -931,7 +1007,10 @@ pub struct TableFunctionArgs {
 }
 
 /// A table name or a parenthesized subquery with an optional alias
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 #[cfg_attr(feature = "visitor", visit(with = "visit_table_factor"))]
@@ -1083,7 +1162,10 @@ pub enum TableFactor {
 }
 
 /// The source of values in a `PIVOT` operation.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum PivotValueSource {
@@ -1120,7 +1202,10 @@ impl fmt::Display for PivotValueSource {
 /// An item in the `MEASURES` subclause of a `MATCH_RECOGNIZE` operation.
 ///
 /// See <https://docs.snowflake.com/en/sql-reference/constructs/match_recognize#measures-specifying-additional-output-columns>.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct Measure {
@@ -1137,7 +1222,10 @@ impl fmt::Display for Measure {
 /// The rows per match option in a `MATCH_RECOGNIZE` operation.
 ///
 /// See <https://docs.snowflake.com/en/sql-reference/constructs/match_recognize#row-s-per-match-specifying-the-rows-to-return>.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum RowsPerMatch {
@@ -1165,7 +1253,10 @@ impl fmt::Display for RowsPerMatch {
 /// The after match skip option in a `MATCH_RECOGNIZE` operation.
 ///
 /// See <https://docs.snowflake.com/en/sql-reference/constructs/match_recognize#after-match-skip-specifying-where-to-continue-after-a-match>.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum AfterMatchSkip {
@@ -1191,7 +1282,10 @@ impl fmt::Display for AfterMatchSkip {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum EmptyMatchesMode {
@@ -1216,7 +1310,10 @@ impl fmt::Display for EmptyMatchesMode {
 /// A symbol defined in a `MATCH_RECOGNIZE` operation.
 ///
 /// See <https://docs.snowflake.com/en/sql-reference/constructs/match_recognize#define-defining-symbols>.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct SymbolDefinition {
@@ -1231,7 +1328,10 @@ impl fmt::Display for SymbolDefinition {
 }
 
 /// A symbol in a `MATCH_RECOGNIZE` pattern.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum MatchRecognizeSymbol {
@@ -1256,7 +1356,10 @@ impl fmt::Display for MatchRecognizeSymbol {
 /// The pattern in a `MATCH_RECOGNIZE` operation.
 ///
 /// See <https://docs.snowflake.com/en/sql-reference/constructs/match_recognize#pattern-specifying-the-pattern-to-match>.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum MatchRecognizePattern {
@@ -1293,7 +1396,10 @@ impl fmt::Display for MatchRecognizePattern {
 
 /// Determines the minimum and maximum allowed occurrences of a pattern in a
 /// `MATCH_RECOGNIZE` operation.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum RepetitionQuantifier {
@@ -1537,7 +1643,10 @@ impl fmt::Display for TableFactor {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct TableAlias {
@@ -1555,7 +1664,10 @@ impl fmt::Display for TableAlias {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum TableVersion {
@@ -1571,7 +1683,10 @@ impl Display for TableVersion {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct Join {
@@ -1682,7 +1797,10 @@ impl fmt::Display for Join {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum JoinOperator {
@@ -1713,7 +1831,10 @@ pub enum JoinOperator {
     },
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum JoinConstraint {
@@ -1723,7 +1844,10 @@ pub enum JoinConstraint {
     None,
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct OrderBy {
@@ -1752,7 +1876,10 @@ impl fmt::Display for OrderBy {
 }
 
 /// An `ORDER BY` expression
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct OrderByExpr {
@@ -1790,7 +1917,10 @@ impl fmt::Display for OrderByExpr {
 /// Supported by [ClickHouse syntax]
 ///
 /// [ClickHouse syntax]: <https://clickhouse.com/docs/en/sql-reference/statements/select/order-by#order-by-expr-with-fill-modifier>
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct WithFill {
@@ -1819,7 +1949,10 @@ impl fmt::Display for WithFill {
 /// Supported by [ClickHouse syntax]
 ///
 /// [ClickHouse syntax]: <https://clickhouse.com/docs/en/sql-reference/statements/select/order-by#order-by-expr-with-fill-modifier>
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct InterpolateExpr {
@@ -1827,7 +1960,10 @@ pub struct InterpolateExpr {
     pub expr: Option<Expr>,
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct Interpolate {
@@ -1844,7 +1980,10 @@ impl fmt::Display for InterpolateExpr {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct Offset {
@@ -1879,7 +2018,10 @@ impl fmt::Display for OffsetRows {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct Fetch {
@@ -1900,7 +2042,10 @@ impl fmt::Display for Fetch {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct LockClause {
@@ -1958,7 +2103,10 @@ impl fmt::Display for NonBlock {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum Distinct {
@@ -1981,7 +2129,10 @@ impl fmt::Display for Distinct {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct Top {
@@ -1993,7 +2144,10 @@ pub struct Top {
     pub quantity: Option<TopQuantity>,
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum TopQuantity {
@@ -2020,7 +2174,10 @@ impl fmt::Display for Top {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct Values {
@@ -2044,7 +2201,10 @@ impl fmt::Display for Values {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct SelectInto {
@@ -2087,7 +2247,10 @@ impl fmt::Display for GroupByWithModifier {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum GroupByExpr {
@@ -2131,7 +2294,10 @@ impl fmt::Display for GroupByExpr {
 /// FORMAT identifier or FORMAT NULL clause, specific to ClickHouse.
 ///
 /// [ClickHouse]: <https://clickhouse.com/docs/en/sql-reference/statements/select/format>
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum FormatClause {
@@ -2150,7 +2316,10 @@ impl fmt::Display for FormatClause {
 
 /// FOR XML or FOR JSON clause, specific to MSSQL
 /// (formats the output of a query as XML or JSON)
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum ForClause {
@@ -2220,7 +2389,10 @@ impl fmt::Display for ForClause {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum ForXml {
@@ -2280,7 +2452,10 @@ impl fmt::Display for ForJson {
 ///     )
 /// ) AS jt;
 /// ```
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct JsonTableColumn {
@@ -2320,7 +2495,10 @@ impl fmt::Display for JsonTableColumn {
 
 /// Stores the error handling clause of a `JSON_TABLE` table valued function:
 /// {NULL | DEFAULT json_string | ERROR} ON {ERROR | EMPTY }
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum JsonTableColumnErrorHandling {

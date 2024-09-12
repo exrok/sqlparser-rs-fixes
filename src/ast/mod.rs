@@ -184,7 +184,10 @@ impl fmt::Display for Ident {
 }
 
 /// A name of a table, view, custom type, etc., possibly multi-part, i.e. db.schema.obj
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct ObjectName(pub Vec<Ident>);
@@ -197,7 +200,10 @@ impl fmt::Display for ObjectName {
 
 /// Represents an Array Expression, either
 /// `ARRAY[..]`, or `[..]`
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct Array {
@@ -227,7 +233,10 @@ impl fmt::Display for Array {
 /// The parser does not validate the `<value>`, nor does it ensure
 /// that the `<leading_field>` units >= the units in `<last_field>`,
 /// so the user will have to reject intervals like `HOUR TO YEAR`.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct Interval {
@@ -286,7 +295,10 @@ impl fmt::Display for Interval {
 /// A field definition within a struct
 ///
 /// [bigquery]: https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#struct_type
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct StructField {
@@ -307,7 +319,10 @@ impl fmt::Display for StructField {
 /// A field definition within a union
 ///
 /// [duckdb]: https://duckdb.org/docs/sql/data_types/union.html
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct UnionField {
@@ -324,7 +339,10 @@ impl fmt::Display for UnionField {
 /// A dictionary field within a dictionary.
 ///
 /// [duckdb]: https://duckdb.org/docs/sql/data_types/struct#creating-structs
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct DictionaryField {
@@ -339,7 +357,10 @@ impl fmt::Display for DictionaryField {
 }
 
 /// Represents a Map expression.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct Map {
@@ -355,7 +376,10 @@ impl Display for Map {
 /// A map field within a map.
 ///
 /// [duckdb]: https://duckdb.org/docs/sql/data_types/map.html#creating-maps
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct MapEntry {
@@ -371,7 +395,10 @@ impl fmt::Display for MapEntry {
 
 /// Options for `CAST` / `TRY_CAST`
 /// BigQuery: <https://cloud.google.com/bigquery/docs/reference/standard-sql/format-elements#formatting_syntax>
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum CastFormat {
@@ -380,7 +407,10 @@ pub enum CastFormat {
 }
 
 /// Represents the syntax/style used in a map access.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum MapAccessSyntax {
@@ -396,7 +426,10 @@ pub enum MapAccessSyntax {
 /// ```sql
 /// SELECT mymap[SAFE_OFFSET(0)];
 /// ```
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct MapAccessKey {
@@ -414,7 +447,10 @@ impl fmt::Display for MapAccessKey {
 }
 
 /// An element of a JSON path.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum JsonPathElem {
@@ -433,7 +469,10 @@ pub enum JsonPathElem {
 ///
 /// See <https://docs.snowflake.com/en/user-guide/querying-semistructured>.
 /// See <https://docs.databricks.com/en/sql/language-manual/sql-ref-json-path-expression.html>.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct JsonPath {
@@ -467,7 +506,10 @@ impl fmt::Display for JsonPath {
 }
 
 /// The syntax used for in a cast expression.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum CastKind {
@@ -492,7 +534,10 @@ pub enum CastKind {
 /// or the comma syntax.
 ///
 /// See <https://docs.snowflake.com/en/sql-reference/functions/extract>
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum ExtractSyntax {
@@ -510,7 +555,10 @@ pub enum ExtractSyntax {
 ///
 /// Other dialects either support `CEIL/FLOOR( <expr> [, <scale>])` format or just
 /// `CEIL/FLOOR(<expr>)`.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum CeilFloorKind {
@@ -525,7 +573,10 @@ pub enum CeilFloorKind {
 /// The parser does not distinguish between expressions of different types
 /// (e.g. boolean vs string), so the caller must handle expressions of
 /// inappropriate type, like `WHERE 1` or `SELECT 1=1`, as necessary.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(
     feature = "visitor",
@@ -914,7 +965,10 @@ pub enum Expr {
 }
 
 /// The contents inside the `[` and `]` in a subscript expression.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum Subscript {
@@ -976,7 +1030,10 @@ impl fmt::Display for Subscript {
 }
 
 /// A lambda function.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct LambdaFunction {
@@ -1014,7 +1071,10 @@ impl fmt::Display for LambdaFunction {
 ///
 /// assert_eq!(one.into_iter().chain(many).collect::<Vec<_>>(), vec!["a", "a", "b"] );
 /// ```
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum OneOrManyWithParens<T> {
@@ -1617,7 +1677,10 @@ impl fmt::Display for Expr {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum WindowType {
@@ -1635,7 +1698,10 @@ impl Display for WindowType {
 }
 
 /// A window specification (i.e. `OVER ([window_name] PARTITION BY .. ORDER BY .. etc.)`)
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct WindowSpec {
@@ -1697,7 +1763,10 @@ impl fmt::Display for WindowSpec {
 ///
 /// Note: The parser does not validate the specified bounds; the caller should
 /// reject invalid bounds like `ROWS UNBOUNDED FOLLOWING` before execution.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct WindowFrame {
@@ -1763,7 +1832,10 @@ impl fmt::Display for NullTreatment {
 }
 
 /// Specifies [WindowFrame]'s `start_bound` and `end_bound`
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum WindowFrameBound {
@@ -1848,7 +1920,10 @@ impl fmt::Display for CommentObject {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum Password {
@@ -1863,7 +1938,10 @@ pub enum Password {
 /// DECLARE variable_name := 42
 /// DECLARE variable_name DEFAULT 42
 /// ```
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum DeclareAssignment {
@@ -1921,7 +1999,10 @@ impl fmt::Display for DeclareAssignment {
 }
 
 /// Represents the type of a `DECLARE` statement.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum DeclareType {
@@ -1978,7 +2059,10 @@ impl fmt::Display for DeclareType {
 /// [Postgres]: https://www.postgresql.org/docs/current/sql-declare.html
 /// [Snowflake]: https://docs.snowflake.com/en/sql-reference/snowflake-scripting/declare
 /// [BigQuery]: https://cloud.google.com/bigquery/docs/reference/standard-sql/procedural-language#declare
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct Declare {
@@ -2073,7 +2157,10 @@ impl fmt::Display for Declare {
 }
 
 /// Sql options of a `CREATE TABLE` statement.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum CreateTableOptions {
@@ -2119,7 +2206,10 @@ impl fmt::Display for CreateTableOptions {
 /// ```sql
 /// [FROM] table
 /// ```
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum FromTable {
@@ -2132,7 +2222,10 @@ pub enum FromTable {
 
 /// A top-level statement (SELECT, INSERT, CREATE, etc.)
 #[allow(clippy::large_enum_variant)]
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(
     feature = "visitor",
@@ -4704,7 +4797,10 @@ impl fmt::Display for Statement {
 ///     [ MINVALUE minvalue | NO MINVALUE ] [ MAXVALUE maxvalue | NO MAXVALUE ]
 ///     [ START [ WITH ] start ] [ CACHE cache ] [ [ NO ] CYCLE ]
 /// ```
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum SequenceOptions {
@@ -4760,7 +4856,11 @@ impl fmt::Display for SequenceOptions {
 /// Target of a `TRUNCATE TABLE` command
 ///
 /// Note this is its own struct because `visit_relation` requires an `ObjectName` (not a `Vec<ObjectName>`)
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct TruncateTableTarget {
@@ -4777,7 +4877,10 @@ impl fmt::Display for TruncateTableTarget {
 
 /// PostgreSQL identity option for TRUNCATE table
 /// [ RESTART IDENTITY | CONTINUE IDENTITY ]
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum TruncateIdentityOption {
@@ -4787,7 +4890,10 @@ pub enum TruncateIdentityOption {
 
 /// PostgreSQL cascade option for TRUNCATE table
 /// [ CASCADE | RESTRICT ]
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum TruncateCascadeOption {
@@ -4797,7 +4903,10 @@ pub enum TruncateCascadeOption {
 
 /// Can use to describe options in  create sequence or table column type identity
 /// [ MINVALUE minvalue | NO MINVALUE ] [ MAXVALUE maxvalue | NO MAXVALUE ]
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum MinMaxValue {
@@ -4809,7 +4918,10 @@ pub enum MinMaxValue {
     Some(Expr),
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 #[non_exhaustive]
@@ -4820,7 +4932,10 @@ pub enum OnInsert {
     OnConflict(OnConflict),
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct InsertAliases {
@@ -4828,21 +4943,31 @@ pub struct InsertAliases {
     pub col_aliases: Option<Vec<Ident>>,
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct OnConflict {
     pub conflict_target: Option<ConflictTarget>,
     pub action: OnConflictAction,
 }
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum ConflictTarget {
     Columns(Vec<Ident>),
     OnConstraint(ObjectName),
 }
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum OnConflictAction {
@@ -4850,7 +4975,10 @@ pub enum OnConflictAction {
     DoUpdate(DoUpdate),
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct DoUpdate {
@@ -4912,7 +5040,10 @@ impl fmt::Display for OnConflictAction {
 }
 
 /// Privileges granted in a GRANT statement or revoked in a REVOKE statement.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum Privileges {
@@ -4949,7 +5080,10 @@ impl fmt::Display for Privileges {
 }
 
 /// Specific direction for FETCH statement
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum FetchDirection {
@@ -5013,7 +5147,10 @@ impl fmt::Display for FetchDirection {
 }
 
 /// A privilege on a database object (table, sequence, etc.).
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum Action {
@@ -5063,7 +5200,10 @@ impl fmt::Display for Action {
 }
 
 /// Objects on which privileges are granted in a GRANT statement.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum GrantObjects {
@@ -5110,7 +5250,10 @@ impl fmt::Display for GrantObjects {
 }
 
 /// SQL assignment `foo = expr` as used in SQLUpdate
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct Assignment {
@@ -5127,7 +5270,10 @@ impl fmt::Display for Assignment {
 /// Left-hand side of an assignment in an UPDATE statement,
 /// e.g. `foo` in `foo = 5` (ColumnName assignment) or
 /// `(a, b)` in `(a, b) = (1, 2)` (Tuple assignment).
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum AssignmentTarget {
@@ -5146,7 +5292,10 @@ impl fmt::Display for AssignmentTarget {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum FunctionArgExpr {
@@ -5177,7 +5326,10 @@ impl fmt::Display for FunctionArgExpr {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 /// Operator used to separate function arguments
@@ -5200,7 +5352,10 @@ impl fmt::Display for FunctionArgOperator {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum FunctionArg {
@@ -5225,7 +5380,10 @@ impl fmt::Display for FunctionArg {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum CloseCursor {
@@ -5243,7 +5401,10 @@ impl fmt::Display for CloseCursor {
 }
 
 /// A function call
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct Function {
@@ -5313,7 +5474,10 @@ impl fmt::Display for Function {
 }
 
 /// The arguments passed to a function call.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum FunctionArguments {
@@ -5339,7 +5503,10 @@ impl fmt::Display for FunctionArguments {
 }
 
 /// This represents everything inside the parentheses when calling a function.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct FunctionArgumentList {
@@ -5364,7 +5531,10 @@ impl fmt::Display for FunctionArgumentList {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum FunctionArgumentClause {
@@ -5487,7 +5657,10 @@ impl fmt::Display for FileFormat {
 }
 
 /// The `ON OVERFLOW` clause of a LISTAGG invocation
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum ListAggOnOverflow {
@@ -5523,7 +5696,10 @@ impl fmt::Display for ListAggOnOverflow {
 }
 
 /// The `HAVING` clause in a call to `ANY_VALUE` on BigQuery.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct HavingBound(pub HavingBoundKind, pub Expr);
@@ -5599,7 +5775,10 @@ impl fmt::Display for KillType {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum HiveDistributionStyle {
@@ -5614,7 +5793,10 @@ pub enum HiveDistributionStyle {
     NONE,
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum HiveRowFormat {
@@ -5622,7 +5804,10 @@ pub enum HiveRowFormat {
     DELIMITED { delimiters: Vec<HiveRowDelimiter> },
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct HiveRowDelimiter {
@@ -5701,7 +5886,10 @@ impl fmt::Display for DescribeAlias {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 #[allow(clippy::large_enum_variant)]
@@ -5715,7 +5903,11 @@ pub enum HiveIOFormat {
     },
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash, Default)]
+#[derive(Default)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct HiveFormat {
@@ -5725,7 +5917,10 @@ pub struct HiveFormat {
     pub location: Option<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct ClusteredIndex {
@@ -5744,7 +5939,10 @@ impl fmt::Display for ClusteredIndex {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum TableOptionsClustered {
@@ -5774,7 +5972,10 @@ impl fmt::Display for TableOptionsClustered {
 }
 
 /// Specifies which partition the boundary values on table partitioning belongs to.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum PartitionRangeDirection {
@@ -5782,7 +5983,10 @@ pub enum PartitionRangeDirection {
     Right,
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum SqlOption {
@@ -5844,7 +6048,10 @@ impl fmt::Display for SqlOption {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct SecretOption {
@@ -5858,7 +6065,10 @@ impl fmt::Display for SecretOption {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum AttachDuckDBDatabaseOption {
@@ -5958,7 +6168,10 @@ impl fmt::Display for TransactionModifier {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum ShowStatementFilter {
@@ -6031,7 +6244,10 @@ impl fmt::Display for crate::ast::MysqlInsertPriority {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum CopySource {
@@ -6045,7 +6261,10 @@ pub enum CopySource {
     Query(Box<Query>),
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum CopyTarget {
@@ -6089,7 +6308,10 @@ pub enum OnCommit {
 /// An option in `COPY` statement.
 ///
 /// <https://www.postgresql.org/docs/14/sql-copy.html>
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum CopyOption {
@@ -6143,7 +6365,10 @@ impl fmt::Display for CopyOption {
 /// An option in `COPY` statement before PostgreSQL version 9.0.
 ///
 /// <https://www.postgresql.org/docs/8.4/sql-copy.html>
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum CopyLegacyOption {
@@ -6172,7 +6397,10 @@ impl fmt::Display for CopyLegacyOption {
 /// A `CSV` option in `COPY` statement before PostgreSQL version 9.0.
 ///
 /// <https://www.postgresql.org/docs/8.4/sql-copy.html>
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum CopyLegacyCsvOption {
@@ -6211,7 +6439,10 @@ impl fmt::Display for CopyLegacyCsvOption {
 /// ```
 /// [Snowflake](https://docs.snowflake.com/en/sql-reference/sql/merge)
 /// [BigQuery](https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#merge_statement)
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum MergeClauseKind {
@@ -6244,7 +6475,10 @@ impl Display for MergeClauseKind {
 ///
 /// [Snowflake](https://docs.snowflake.com/en/sql-reference/sql/merge)
 /// [BigQuery](https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#merge_statement)
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum MergeInsertKind {
@@ -6288,7 +6522,10 @@ impl Display for MergeInsertKind {
 ///
 /// [Snowflake](https://docs.snowflake.com/en/sql-reference/sql/merge)
 /// [BigQuery](https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#merge_statement)
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct MergeInsertExpr {
@@ -6322,7 +6559,10 @@ impl Display for MergeInsertExpr {
 ///
 /// [Snowflake](https://docs.snowflake.com/en/sql-reference/sql/merge)
 /// [BigQuery](https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#merge_statement)
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum MergeAction {
@@ -6368,7 +6608,10 @@ impl Display for MergeAction {
 /// ```
 /// [Snowflake](https://docs.snowflake.com/en/sql-reference/sql/merge)
 /// [BigQuery](https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#merge_statement)
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct MergeClause {
@@ -6500,7 +6743,10 @@ impl fmt::Display for ContextModifier {
 }
 
 /// Function describe in DROP FUNCTION.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum DropFunctionOption {
     Restrict,
@@ -6517,7 +6763,10 @@ impl fmt::Display for DropFunctionOption {
 }
 
 /// Generic function description for DROP FUNCTION and CREATE TRIGGER.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct FunctionDesc {
@@ -6536,7 +6785,10 @@ impl fmt::Display for FunctionDesc {
 }
 
 /// Function argument in CREATE OR DROP FUNCTION.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct OperateFunctionArg {
@@ -6585,7 +6837,10 @@ impl fmt::Display for OperateFunctionArg {
 }
 
 /// The mode of an argument in CREATE FUNCTION.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum ArgMode {
@@ -6605,7 +6860,10 @@ impl fmt::Display for ArgMode {
 }
 
 /// These attributes inform the query optimizer about the behavior of the function.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum FunctionBehavior {
@@ -6625,7 +6883,10 @@ impl fmt::Display for FunctionBehavior {
 }
 
 /// These attributes describe the behavior of the function when called with a null argument.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum FunctionCalledOnNull {
@@ -6645,7 +6906,10 @@ impl fmt::Display for FunctionCalledOnNull {
 }
 
 /// If it is safe for PostgreSQL to call the function from multiple threads at once
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum FunctionParallel {
@@ -6667,7 +6931,10 @@ impl fmt::Display for FunctionParallel {
 /// [BigQuery] Determinism specifier used in a UDF definition.
 ///
 /// [BigQuery]: https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#syntax_11
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum FunctionDeterminismSpecifier {
@@ -6693,7 +6960,10 @@ impl fmt::Display for FunctionDeterminismSpecifier {
 ///
 /// [BigQuery]: https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#syntax_11
 /// [Postgres]: https://www.postgresql.org/docs/15/sql-createfunction.html
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum CreateFunctionBody {
@@ -6734,7 +7004,10 @@ pub enum CreateFunctionBody {
     Return(Expr),
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum CreateFunctionUsing {
@@ -6758,7 +7031,10 @@ impl fmt::Display for CreateFunctionUsing {
 ///
 /// See [Create Macro - DuckDB](https://duckdb.org/docs/sql/statements/create_macro)
 /// for more details
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct MacroArg {
@@ -6786,7 +7062,10 @@ impl fmt::Display for MacroArg {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum MacroDefinition {
@@ -6807,7 +7086,10 @@ impl fmt::Display for MacroDefinition {
 /// Schema possible naming variants ([1]).
 ///
 /// [1]: https://jakewheat.github.io/sql-overview/sql-2016-foundation-grammar.html#schema-definition
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum SchemaName {
@@ -6838,7 +7120,10 @@ impl fmt::Display for SchemaName {
 /// Fulltext search modifiers ([1]).
 ///
 /// [1]: https://dev.mysql.com/doc/refman/8.0/en/fulltext-search.html#function_match
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum SearchModifier {
@@ -6873,7 +7158,10 @@ impl fmt::Display for SearchModifier {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct LockTable {
@@ -6899,7 +7187,10 @@ impl fmt::Display for LockTable {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum LockTableType {
@@ -6928,7 +7219,10 @@ impl fmt::Display for LockTableType {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct HiveSetLocation {
@@ -6947,7 +7241,10 @@ impl fmt::Display for HiveSetLocation {
 
 /// MySQL `ALTER TABLE` only  [FIRST | AFTER column_name]
 #[allow(clippy::large_enum_variant)]
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum MySQLColumnPosition {
@@ -6970,7 +7267,10 @@ impl Display for MySQLColumnPosition {
 /// Engine of DB. Some warehouse has parameters of engine, e.g. [clickhouse]
 ///
 /// [clickhouse]: https://clickhouse.com/docs/en/engines/table-engines
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct TableEngine {
@@ -6994,7 +7294,10 @@ impl Display for TableEngine {
 ///
 /// <https://docs.snowflake.com/en/sql-reference/sql/create-table>
 /// <https://docs.snowflake.com/en/user-guide/security-row-intro>
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct RowAccessPolicy {
@@ -7022,7 +7325,10 @@ impl Display for RowAccessPolicy {
 /// Snowflake `WITH TAG ( tag_name = '<tag_value>', ...)`
 ///
 /// <https://docs.snowflake.com/en/sql-reference/sql/create-table>
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct Tag {
@@ -7043,7 +7349,10 @@ impl Display for Tag {
 }
 
 /// Helper to indicate if a comment includes the `=` in the display form
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum CommentDef {
@@ -7081,7 +7390,10 @@ impl Display for CommentDef {
 /// let items = WrappedCollection::NoWrapping(vec!["one", "two", "three"]);
 /// assert_eq!("one, two, three", items.to_string());
 /// ```
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, PartialOrd, Eq, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum WrappedCollection<T> {
@@ -7114,7 +7426,10 @@ mod tests {
     #[test]
     fn test_window_frame_default() {
         let window_frame = WindowFrame::default();
-        assert_eq!(WindowFrameBound::Preceding(None), window_frame.start_bound);
+        assert!(matches!(
+            window_frame.start_bound,
+            WindowFrameBound::Preceding(None)
+        ));
     }
 
     #[test]
@@ -7325,6 +7640,7 @@ mod tests {
         assert_eq!(Vec::from_iter(&many2), vec![&"c", &"d"]);
     }
 
+    #[cfg(feature = "clone-ast")]
     #[test]
     fn test_one_or_many_with_parens_value_into_iter() {
         use core::iter::once;

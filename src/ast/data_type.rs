@@ -25,7 +25,11 @@ use crate::ast::{display_comma_separated, ObjectName, StructField, UnionField};
 use super::{value::escape_single_quote_string, ColumnDef};
 
 /// SQL data types
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum DataType {
@@ -626,7 +630,11 @@ fn format_clickhouse_datetime_precision_and_timezone(
 }
 
 /// Type of brackets used for `STRUCT` literals.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum StructBracketKind {
@@ -780,7 +788,11 @@ impl fmt::Display for CharLengthUnits {
 /// the syntax used to declare the array.
 ///
 /// For example: Bigquery/Hive use `ARRAY<INT>` whereas snowflake uses ARRAY.
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum ArrayElemTypeDef {

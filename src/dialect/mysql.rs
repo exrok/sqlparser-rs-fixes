@@ -14,7 +14,7 @@
 use alloc::boxed::Box;
 
 use crate::{
-    ast::{BinaryOperator, Expr, LockTable, LockTableType, Statement},
+    ast::{BinaryOperator, Expr, Ident, LockTable, LockTableType, Statement},
     dialect::Dialect,
     keywords::Keyword,
     parser::{Parser, ParserError},
@@ -60,16 +60,24 @@ impl Dialect for MySqlDialect {
     fn parse_infix(
         &self,
         parser: &mut crate::parser::Parser,
-        expr: &crate::ast::Expr,
+        expr: &mut crate::ast::Expr,
         _precedence: u8,
-    ) -> Option<Result<crate::ast::Expr, ParserError>> {
+    ) -> Option<Result<(), ParserError>> {
         // Parse DIV as an operator
         if parser.parse_keyword(Keyword::DIV) {
-            Some(Ok(Expr::BinaryOp {
-                left: Box::new(expr.clone()),
+            let left = std::mem::replace(
+                expr,
+                Expr::Identifier(Ident {
+                    value: String::new(),
+                    quote_style: None,
+                }),
+            );
+            *expr = Expr::BinaryOp {
+                left: Box::new(left),
                 op: BinaryOperator::MyIntegerDivide,
                 right: Box::new(parser.parse_expr().unwrap()),
-            }))
+            };
+            Some(Ok(()))
         } else {
             None
         }

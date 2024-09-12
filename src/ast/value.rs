@@ -26,7 +26,10 @@ use crate::ast::Ident;
 use sqlparser_derive::{Visit, VisitMut};
 
 /// Primitive SQL values such as number and string
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum Value {
@@ -145,7 +148,10 @@ impl fmt::Display for DollarQuotedString {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum DateTimeField {

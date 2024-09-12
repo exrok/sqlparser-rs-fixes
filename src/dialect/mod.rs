@@ -324,9 +324,9 @@ pub trait Dialect: Debug + Any {
     fn parse_infix(
         &self,
         _parser: &mut Parser,
-        _expr: &Expr,
+        _expr: &mut Expr,
         _precedence: u8,
-    ) -> Option<Result<Expr, ParserError>> {
+    ) -> Option<Result<(), ParserError>> {
         // return None to fall back to the default behavior
         None
     }
@@ -667,6 +667,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(all(feature = "cmp-ast", feature = "debug-ast"))]
     fn parse_with_wrapped_dialect() {
         /// Wrapper for a dialect. In a real-world example, this wrapper
         /// would tweak the behavior of the dialect. For the test case,
@@ -732,9 +733,9 @@ mod tests {
             fn parse_infix(
                 &self,
                 parser: &mut sqlparser::parser::Parser,
-                expr: &Expr,
+                expr: &mut Expr,
                 precedence: u8,
-            ) -> Option<Result<Expr, sqlparser::parser::ParserError>> {
+            ) -> Option<Result<(), sqlparser::parser::ParserError>> {
                 self.0.parse_infix(parser, expr, precedence)
             }
 

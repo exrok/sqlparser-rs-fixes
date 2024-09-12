@@ -43,7 +43,10 @@ use crate::parser::ParserError;
 /// ```
 ///
 /// [1]: crate::ast::Statement::CreateTable
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct CreateTableBuilder {
@@ -515,6 +518,7 @@ pub(crate) struct CreateTableConfiguration {
 }
 
 #[cfg(test)]
+#[cfg(feature = "debug-ast")]
 mod tests {
     use crate::ast::helpers::stmt_create_table::CreateTableBuilder;
     use crate::ast::{Ident, ObjectName, Statement};
@@ -522,11 +526,12 @@ mod tests {
 
     #[test]
     pub fn test_from_valid_statement() {
-        let builder = CreateTableBuilder::new(ObjectName(vec![Ident::new("table_name")]));
+        let builder1 = CreateTableBuilder::new(ObjectName(vec![Ident::new("table_name")]));
+        let builder2 = CreateTableBuilder::new(ObjectName(vec![Ident::new("table_name")]));
 
-        let stmt = builder.clone().build();
+        let stmt = builder2.build();
 
-        assert_eq!(builder, CreateTableBuilder::try_from(stmt).unwrap());
+        assert_eq!(builder1, CreateTableBuilder::try_from(stmt).unwrap());
     }
 
     #[test]

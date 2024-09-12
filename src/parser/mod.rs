@@ -905,6 +905,7 @@ impl<'a> Parser<'a> {
         let _guard = self.recursion_counter.try_decrease()?;
         debug!("parsing expr");
         let mut expr = self.parse_prefix()?;
+        #[cfg(feature = "debug-ast")]
         debug!("prefix: {:?}", expr);
         loop {
             let next_precedence = self.get_next_precedence()?;
@@ -2105,7 +2106,7 @@ impl<'a> Parser<'a> {
         };
 
         let (leading_precision, last_field, fsec_precision) =
-            if leading_field == Some(DateTimeField::Second) {
+            if matches!(leading_field, Some(DateTimeField::Second)) {
                 // SQL mandates special syntax for `SECOND TO SECOND` literals.
                 // Instead of
                 //     `SECOND [(<leading precision>)] TO SECOND[(<fractional seconds precision>)]`
@@ -2118,7 +2119,7 @@ impl<'a> Parser<'a> {
                 let leading_precision = self.parse_optional_precision()?;
                 if self.parse_keyword(Keyword::TO) {
                     let last_field = Some(self.parse_date_time_field()?);
-                    let fsec_precision = if last_field == Some(DateTimeField::Second) {
+                    let fsec_precision = if matches!(last_field, Some(DateTimeField::Second)) {
                         self.parse_optional_precision()?
                     } else {
                         None
@@ -2513,10 +2514,11 @@ impl<'a> Parser<'a> {
     }
 
     /// Parse an operator following an expression
-    pub fn parse_infix(&mut self, expr: Expr, precedence: u8) -> Result<Expr, ParserError> {
+    pub fn parse_infix(&mut self, mut expr: Expr, precedence: u8) -> Result<Expr, ParserError> {
         // allow the dialect to override infix parsing
-        if let Some(infix) = self.dialect.parse_infix(self, &expr, precedence) {
-            return infix;
+        if let Some(value) = self.dialect.parse_infix(self, &mut expr, precedence) {
+            value?;
+            return Ok(expr);
         }
 
         let mut tok = self.next_token();
@@ -11944,6 +11946,7 @@ impl Word {
 }
 
 #[cfg(test)]
+#[cfg(all(feature = "cmp-ast", feature = "debug-ast"))]
 mod tests {
     use crate::test_utils::{all_dialects, TestedDialects};
 

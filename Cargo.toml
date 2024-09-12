@@ -8,12 +8,9 @@ documentation = "https://docs.rs/sqlparser/"
 keywords = ["ansi", "sql", "lexer", "parser"]
 repository = "https://github.com/sqlparser-rs/sqlparser-rs"
 license = "Apache-2.0"
-include = [
-    "src/**/*.rs",
-    "Cargo.toml",
-    "LICENSE.TXT",
-]
+include = ["src/**/*.rs", "Cargo.toml", "LICENSE.TXT"]
 edition = "2021"
+resolver = "2"
 
 [lib]
 name = "sqlparser"
@@ -25,6 +22,10 @@ std = []
 # Enable JSON output in the `cli` example:
 json_example = ["serde_json", "serde"]
 visitor = ["sqlparser_derive"]
+hash-ast = []
+clone-ast = []
+cmp-ast = []
+debug-ast = []
 
 [dependencies]
 bigdecimal = { version = "0.4.1", features = ["serde"], optional = true }
@@ -40,6 +41,12 @@ sqlparser_derive = { version = "0.2.0", path = "derive", optional = true }
 simple_logger = "5.0"
 matches = "0.1"
 pretty_assertions = "1"
+sqlparser = { path = ".", features = [
+    "hash-ast",
+    "clone-ast",
+    "cmp-ast",
+    "debug-ast",
+] }
 
 [package.metadata.release]
 # Instruct `cargo release` to not run `cargo publish` locally:

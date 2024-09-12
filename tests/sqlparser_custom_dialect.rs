@@ -13,7 +13,7 @@
 //! Test the ability for dialects to override parsing
 
 use sqlparser::{
-    ast::{BinaryOperator, Expr, Statement, Value},
+    ast::{BinaryOperator, Expr, Ident, Statement, Value},
     dialect::Dialect,
     keywords::Keyword,
     parser::{Parser, ParserError},
@@ -68,15 +68,23 @@ fn custom_infix_parser() -> Result<(), ParserError> {
         fn parse_infix(
             &self,
             parser: &mut Parser,
-            expr: &Expr,
+            expr: &mut Expr,
             _precedence: u8,
-        ) -> Option<Result<Expr, ParserError>> {
+        ) -> Option<Result<(), ParserError>> {
             if parser.consume_token(&Token::Plus) {
-                Some(Ok(Expr::BinaryOp {
-                    left: Box::new(expr.clone()),
+                let left = std::mem::replace(
+                    expr,
+                    Expr::Identifier(Ident {
+                        value: String::new(),
+                        quote_style: None,
+                    }),
+                );
+                *expr = Expr::BinaryOp {
+                    left: Box::new(left),
                     op: BinaryOperator::Multiply, // translate Plus to Multiply
                     right: Box::new(parser.parse_expr().unwrap()),
-                }))
+                };
+                Some(Ok(()))
             } else {
                 None
             }

@@ -50,7 +50,11 @@ impl fmt::Display for TriggerReferencingType {
 }
 
 /// This keyword immediately precedes the declaration of one or two relation names that provide access to the transition relations of the triggering statement
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct TriggerReferencing {
@@ -72,7 +76,11 @@ impl fmt::Display for TriggerReferencing {
 }
 
 /// Used to describe trigger events
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum TriggerEvent {
@@ -138,7 +146,11 @@ impl fmt::Display for TriggerExecBodyType {
     }
 }
 /// This keyword immediately precedes the declaration of one or two relation names that provide access to the transition relations of the triggering statement
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "clone-ast", derive(Clone))]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
+
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub struct TriggerExecBody {
