@@ -66,6 +66,7 @@ pub use self::value::{
     TrimWhereField, Value,
 };
 
+#[cfg(feature = "full-ast")]
 use crate::ast::helpers::stmt_data_loading::{
     DataLoadingOptions, StageLoadSelectItem, StageParamsObject,
 };
@@ -2237,6 +2238,7 @@ pub enum Statement {
     /// ANALYZE
     /// ```
     /// Analyze (Hive)
+    #[cfg(feature = "full-ast")]
     Analyze {
         #[cfg_attr(feature = "visitor", visit(with = "visit_relation"))]
         table_name: ObjectName,
@@ -2252,6 +2254,7 @@ pub enum Statement {
     /// TRUNCATE
     /// ```
     /// Truncate (Hive)
+    #[cfg(feature = "full-ast")]
     Truncate {
         table_names: Vec<TruncateTableTarget>,
         partitions: Option<Vec<Expr>>,
@@ -2271,6 +2274,7 @@ pub enum Statement {
     /// MSCK
     /// ```
     /// Msck (Hive)
+    #[cfg(feature = "full-ast")]
     Msck {
         #[cfg_attr(feature = "visitor", visit(with = "visit_relation"))]
         table_name: ObjectName,
@@ -2284,10 +2288,12 @@ pub enum Statement {
     /// ```sql
     /// INSERT
     /// ```
+    #[cfg(feature = "full-ast")]
     Insert(Insert),
     /// ```sql
     /// INSTALL
     /// ```
+    #[cfg(feature = "full-ast")]
     Install {
         /// Only for DuckDB
         extension_name: Ident,
@@ -2295,11 +2301,13 @@ pub enum Statement {
     /// ```sql
     /// LOAD
     /// ```
+    #[cfg(feature = "full-ast")]
     Load {
         /// Only for DuckDB
         extension_name: Ident,
     },
     // TODO: Support ROW FORMAT
+    #[cfg(feature = "full-ast")]
     Directory {
         overwrite: bool,
         local: bool,
@@ -2310,10 +2318,12 @@ pub enum Statement {
     /// ```sql
     /// CALL <function>
     /// ```
+    #[cfg(feature = "full-ast")]
     Call(Function),
     /// ```sql
     /// COPY [TO | FROM] ...
     /// ```
+    #[cfg(feature = "full-ast")]
     Copy {
         /// The source of 'COPY TO', or the target of 'COPY FROM'
         source: CopySource,
@@ -2336,6 +2346,7 @@ pub enum Statement {
     /// Postgres. Although they share common prefix, it is reasonable to implement them
     /// in different enums. This can be refactored later once custom dialects
     /// are allowed to have custom Statements.
+    #[cfg(feature = "full-ast")]
     CopyIntoSnowflake {
         into: ObjectName,
         from_stage: ObjectName,
@@ -2352,6 +2363,7 @@ pub enum Statement {
     /// CLOSE
     /// ```
     /// Closes the portal underlying an open cursor.
+    #[cfg(feature = "full-ast")]
     Close {
         /// Cursor name
         cursor: CloseCursor,
@@ -2359,6 +2371,7 @@ pub enum Statement {
     /// ```sql
     /// UPDATE
     /// ```
+    #[cfg(feature = "full-ast")]
     Update {
         /// TABLE
         table: TableWithJoins,
@@ -2374,10 +2387,12 @@ pub enum Statement {
     /// ```sql
     /// DELETE
     /// ```
+    #[cfg(feature = "full-ast")]
     Delete(Delete),
     /// ```sql
     /// CREATE VIEW
     /// ```
+    #[cfg(feature = "full-ast")]
     CreateView {
         or_replace: bool,
         materialized: bool,
@@ -2403,11 +2418,13 @@ pub enum Statement {
     /// ```sql
     /// CREATE TABLE
     /// ```
+    #[cfg(feature = "full-ast")]
     CreateTable(CreateTable),
     /// ```sql
     /// CREATE VIRTUAL TABLE .. USING <module_name> (<module_args>)`
     /// ```
     /// Sqlite specific statement
+    #[cfg(feature = "full-ast")]
     CreateVirtualTable {
         #[cfg_attr(feature = "visitor", visit(with = "visit_relation"))]
         name: ObjectName,
@@ -2418,11 +2435,13 @@ pub enum Statement {
     /// ```sql
     /// `CREATE INDEX`
     /// ```
+    #[cfg(feature = "full-ast")]
     CreateIndex(CreateIndex),
     /// ```sql
     /// CREATE ROLE
     /// ```
     /// See [postgres](https://www.postgresql.org/docs/current/sql-createrole.html)
+    #[cfg(feature = "full-ast")]
     CreateRole {
         names: Vec<ObjectName>,
         if_not_exists: bool,
@@ -2449,6 +2468,7 @@ pub enum Statement {
     /// CREATE SECRET
     /// ```
     /// See [duckdb](https://duckdb.org/docs/sql/statements/create_secret.html)
+    #[cfg(feature = "full-ast")]
     CreateSecret {
         or_replace: bool,
         temporary: Option<bool>,
@@ -2461,6 +2481,7 @@ pub enum Statement {
     /// ```sql
     /// ALTER TABLE
     /// ```
+    #[cfg(feature = "full-ast")]
     AlterTable {
         /// Table name
         #[cfg_attr(feature = "visitor", visit(with = "visit_relation"))]
@@ -2477,6 +2498,7 @@ pub enum Statement {
     /// ```sql
     /// ALTER INDEX
     /// ```
+    #[cfg(feature = "full-ast")]
     AlterIndex {
         name: ObjectName,
         operation: AlterIndexOperation,
@@ -2484,6 +2506,7 @@ pub enum Statement {
     /// ```sql
     /// ALTER VIEW
     /// ```
+    #[cfg(feature = "full-ast")]
     AlterView {
         /// View name
         #[cfg_attr(feature = "visitor", visit(with = "visit_relation"))]
@@ -2495,6 +2518,7 @@ pub enum Statement {
     /// ```sql
     /// ALTER ROLE
     /// ```
+    #[cfg(feature = "full-ast")]
     AlterRole {
         name: Ident,
         operation: AlterRoleOperation,
@@ -2503,6 +2527,7 @@ pub enum Statement {
     /// ATTACH DATABASE 'path/to/file' AS alias
     /// ```
     /// (SQLite-specific)
+    #[cfg(feature = "full-ast")]
     AttachDatabase {
         /// The name to bind to the newly attached database
         schema_name: Ident,
@@ -2516,6 +2541,7 @@ pub enum Statement {
     /// ATTACH 'sqlite_file.db' AS sqlite_db (READ_ONLY, TYPE SQLITE);
     /// ```
     /// See <https://duckdb.org/docs/sql/statements/attach.html>
+    #[cfg(feature = "full-ast")]
     AttachDuckDBDatabase {
         if_not_exists: bool,
         /// true if the syntax is 'ATTACH DATABASE', false if it's just 'ATTACH'
@@ -2530,6 +2556,7 @@ pub enum Statement {
     /// DETACH db_alias;
     /// ```
     /// See <https://duckdb.org/docs/sql/statements/attach.html>
+    #[cfg(feature = "full-ast")]
     DetachDuckDBDatabase {
         if_exists: bool,
         /// true if the syntax is 'DETACH DATABASE', false if it's just 'DETACH'
@@ -2539,6 +2566,7 @@ pub enum Statement {
     /// ```sql
     /// DROP [TABLE, VIEW, ...]
     /// ```
+    #[cfg(feature = "full-ast")]
     Drop {
         /// The type of the object to drop: TABLE, VIEW, etc.
         object_type: ObjectType,
@@ -2561,6 +2589,7 @@ pub enum Statement {
     /// ```sql
     /// DROP FUNCTION
     /// ```
+    #[cfg(feature = "full-ast")]
     DropFunction {
         if_exists: bool,
         /// One or more function to drop
@@ -2571,6 +2600,7 @@ pub enum Statement {
     /// ```sql
     /// DROP PROCEDURE
     /// ```
+    #[cfg(feature = "full-ast")]
     DropProcedure {
         if_exists: bool,
         /// One or more function to drop
@@ -2581,6 +2611,7 @@ pub enum Statement {
     /// ```sql
     /// DROP SECRET
     /// ```
+    #[cfg(feature = "full-ast")]
     DropSecret {
         if_exists: bool,
         temporary: Option<bool>,
@@ -2594,6 +2625,7 @@ pub enum Statement {
     ///
     /// Note: this is a PostgreSQL-specific statement,
     /// but may also compatible with other SQL.
+    #[cfg(feature = "full-ast")]
     Declare { stmts: Vec<Declare> },
     /// ```sql
     /// CREATE EXTENSION [ IF NOT EXISTS ] extension_name
@@ -2603,6 +2635,7 @@ pub enum Statement {
     /// ```
     ///
     /// Note: this is a PostgreSQL-specific statement,
+    #[cfg(feature = "full-ast")]
     CreateExtension {
         name: Ident,
         if_not_exists: bool,
@@ -2617,6 +2650,7 @@ pub enum Statement {
     ///
     /// Note: this is a PostgreSQL-specific statement,
     /// but may also compatible with other SQL.
+    #[cfg(feature = "full-ast")]
     Fetch {
         /// Cursor name
         name: Ident,
@@ -2630,6 +2664,7 @@ pub enum Statement {
     ///
     /// Note: this is a Mysql-specific statement,
     /// but may also compatible with other SQL.
+    #[cfg(feature = "full-ast")]
     Flush {
         object_type: FlushType,
         location: Option<FlushLocation>,
@@ -2644,6 +2679,7 @@ pub enum Statement {
     ///
     /// Note: this is a PostgreSQL-specific statement,
     /// but may also compatible with other SQL.
+    #[cfg(feature = "full-ast")]
     Discard { object_type: DiscardObject },
     /// ```sql
     /// SET [ SESSION | LOCAL ] ROLE role_name
@@ -2655,6 +2691,7 @@ pub enum Statement {
     /// [2]: https://www.postgresql.org/docs/14/sql-set-role.html
     /// [3]: https://dev.mysql.com/doc/refman/8.0/en/set-role.html
     /// [4]: https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_10004.htm
+    #[cfg(feature = "full-ast")]
     SetRole {
         /// Non-ANSI optional identifier to inform if the role is defined inside the current session (`SESSION`) or transaction (`LOCAL`).
         context_modifier: ContextModifier,
@@ -2669,6 +2706,7 @@ pub enum Statement {
     /// Note: this is not a standard SQL statement, but it is supported by at
     /// least MySQL and PostgreSQL. Not all MySQL-specific syntactic forms are
     /// supported yet.
+    #[cfg(feature = "full-ast")]
     SetVariable {
         local: bool,
         hivevar: bool,
@@ -2681,12 +2719,14 @@ pub enum Statement {
     ///
     /// Note: this is a PostgreSQL-specific statements
     /// `SET TIME ZONE <value>` is an alias for `SET timezone TO <value>` in PostgreSQL
+    #[cfg(feature = "full-ast")]
     SetTimeZone { local: bool, value: Expr },
     /// ```sql
     /// SET NAMES 'charset_name' [COLLATE 'collation_name']
     /// ```
     ///
     /// Note: this is a MySQL-specific statement.
+    #[cfg(feature = "full-ast")]
     SetNames {
         charset_name: String,
         collation_name: Option<String>,
@@ -2696,22 +2736,26 @@ pub enum Statement {
     /// ```
     ///
     /// Note: this is a MySQL-specific statement.
+    #[cfg(feature = "full-ast")]
     SetNamesDefault {},
     /// `SHOW FUNCTIONS`
     ///
     /// Note: this is a Presto-specific statement.
+    #[cfg(feature = "full-ast")]
     ShowFunctions { filter: Option<ShowStatementFilter> },
     /// ```sql
     /// SHOW <variable>
     /// ```
     ///
     /// Note: this is a PostgreSQL-specific statement.
+    #[cfg(feature = "full-ast")]
     ShowVariable { variable: Vec<Ident> },
     /// ```sql
     /// SHOW [GLOBAL | SESSION] STATUS [LIKE 'pattern' | WHERE expr]
     /// ```
     ///
     /// Note: this is a MySQL-specific statement.
+    #[cfg(feature = "full-ast")]
     ShowStatus {
         filter: Option<ShowStatementFilter>,
         global: bool,
@@ -2722,6 +2766,7 @@ pub enum Statement {
     /// ```
     ///
     /// Note: this is a MySQL-specific statement.
+    #[cfg(feature = "full-ast")]
     ShowVariables {
         filter: Option<ShowStatementFilter>,
         global: bool,
@@ -2732,6 +2777,7 @@ pub enum Statement {
     /// ```
     ///
     /// Note: this is a MySQL-specific statement.
+    #[cfg(feature = "full-ast")]
     ShowCreate {
         obj_type: ShowCreateObject,
         obj_name: ObjectName,
@@ -2741,6 +2787,7 @@ pub enum Statement {
     /// ```
     ///
     /// Note: this is a MySQL-specific statement.
+    #[cfg(feature = "full-ast")]
     ShowColumns {
         extended: bool,
         full: bool,
@@ -2752,6 +2799,7 @@ pub enum Statement {
     /// SHOW TABLES
     /// ```
     /// Note: this is a MySQL-specific statement.
+    #[cfg(feature = "full-ast")]
     ShowTables {
         extended: bool,
         full: bool,
@@ -2763,10 +2811,12 @@ pub enum Statement {
     /// ```
     ///
     /// Note: this is a MySQL-specific statement.
+    #[cfg(feature = "full-ast")]
     ShowCollation { filter: Option<ShowStatementFilter> },
     /// ```sql
     /// `USE ...`
     /// ```
+    #[cfg(feature = "full-ast")]
     Use(Use),
     /// ```sql
     /// START  [ TRANSACTION | WORK ] | START TRANSACTION } ...
@@ -2777,6 +2827,7 @@ pub enum Statement {
     /// `BEGIN  [ TRANSACTION | WORK ] | START TRANSACTION } ...`
     /// ```
     /// If `begin` is true
+    #[cfg(feature = "full-ast")]
     StartTransaction {
         modes: Vec<TransactionMode>,
         begin: bool,
@@ -2786,6 +2837,7 @@ pub enum Statement {
     /// ```sql
     /// SET TRANSACTION ...
     /// ```
+    #[cfg(feature = "full-ast")]
     SetTransaction {
         modes: Vec<TransactionMode>,
         snapshot: Option<Value>,
@@ -2796,6 +2848,7 @@ pub enum Statement {
     /// ```
     ///
     /// Note: this is a PostgreSQL-specific statement.
+    #[cfg(feature = "full-ast")]
     Comment {
         object_type: CommentObject,
         object_name: ObjectName,
@@ -2807,10 +2860,12 @@ pub enum Statement {
     /// ```sql
     /// COMMIT [ TRANSACTION | WORK ] [ AND [ NO ] CHAIN ]
     /// ```
+    #[cfg(feature = "full-ast")]
     Commit { chain: bool },
     /// ```sql
     /// ROLLBACK [ TRANSACTION | WORK ] [ AND [ NO ] CHAIN ] [ TO [ SAVEPOINT ] savepoint_name ]
     /// ```
+    #[cfg(feature = "full-ast")]
     Rollback {
         chain: bool,
         savepoint: Option<Ident>,
@@ -2818,6 +2873,7 @@ pub enum Statement {
     /// ```sql
     /// CREATE SCHEMA
     /// ```
+    #[cfg(feature = "full-ast")]
     CreateSchema {
         /// `<schema name> | AUTHORIZATION <schema authorization identifier>  | <schema name>  AUTHORIZATION <schema authorization identifier>`
         schema_name: SchemaName,
@@ -2826,6 +2882,7 @@ pub enum Statement {
     /// ```sql
     /// CREATE DATABASE
     /// ```
+    #[cfg(feature = "full-ast")]
     CreateDatabase {
         db_name: ObjectName,
         if_not_exists: bool,
@@ -2840,6 +2897,7 @@ pub enum Statement {
     /// 1. [Hive](https://cwiki.apache.org/confluence/display/hive/languagemanual+ddl#LanguageManualDDL-Create/Drop/ReloadFunction)
     /// 2. [Postgres](https://www.postgresql.org/docs/15/sql-createfunction.html)
     /// 3. [BigQuery](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_function_statement)
+    #[cfg(feature = "full-ast")]
     CreateFunction {
         or_replace: bool,
         temporary: bool,
@@ -2910,6 +2968,7 @@ pub enum Statement {
     /// ```
     ///
     /// Postgres: <https://www.postgresql.org/docs/current/sql-createtrigger.html>
+    #[cfg(feature = "full-ast")]
     CreateTrigger {
         /// The `OR REPLACE` clause is used to re-create the trigger if it already exists.
         ///
@@ -2981,6 +3040,7 @@ pub enum Statement {
     /// DROP TRIGGER [ IF EXISTS ] name ON table_name [ CASCADE | RESTRICT ]
     /// ```
     ///
+    #[cfg(feature = "full-ast")]
     DropTrigger {
         if_exists: bool,
         trigger_name: ObjectName,
@@ -2991,6 +3051,7 @@ pub enum Statement {
     /// ```sql
     /// CREATE PROCEDURE
     /// ```
+    #[cfg(feature = "full-ast")]
     CreateProcedure {
         or_alter: bool,
         name: ObjectName,
@@ -3003,6 +3064,7 @@ pub enum Statement {
     ///
     /// Supported variants:
     /// 1. [DuckDB](https://duckdb.org/docs/sql/statements/create_macro)
+    #[cfg(feature = "full-ast")]
     CreateMacro {
         or_replace: bool,
         temporary: bool,
@@ -3014,6 +3076,7 @@ pub enum Statement {
     /// CREATE STAGE
     /// ```
     /// See <https://docs.snowflake.com/en/sql-reference/sql/create-stage>
+    #[cfg(feature = "full-ast")]
     CreateStage {
         or_replace: bool,
         temporary: bool,
@@ -3028,6 +3091,7 @@ pub enum Statement {
     /// ```sql
     /// ASSERT <condition> [AS <message>]
     /// ```
+    #[cfg(feature = "full-ast")]
     Assert {
         condition: Expr,
         message: Option<Expr>,
@@ -3035,6 +3099,7 @@ pub enum Statement {
     /// ```sql
     /// GRANT privileges ON objects TO grantees
     /// ```
+    #[cfg(feature = "full-ast")]
     Grant {
         privileges: Privileges,
         objects: GrantObjects,
@@ -3045,6 +3110,7 @@ pub enum Statement {
     /// ```sql
     /// REVOKE privileges ON objects FROM grantees
     /// ```
+    #[cfg(feature = "full-ast")]
     Revoke {
         privileges: Privileges,
         objects: GrantObjects,
@@ -3057,12 +3123,14 @@ pub enum Statement {
     /// ```
     ///
     /// Note: this is a PostgreSQL-specific statement.
+    #[cfg(feature = "full-ast")]
     Deallocate { name: Ident, prepare: bool },
     /// ```sql
     /// EXECUTE name [ ( parameter [, ...] ) ] [USING <expr>]
     /// ```
     ///
     /// Note: this is a PostgreSQL-specific statement.
+    #[cfg(feature = "full-ast")]
     Execute {
         name: Ident,
         parameters: Vec<Expr>,
@@ -3073,6 +3141,7 @@ pub enum Statement {
     /// ```
     ///
     /// Note: this is a PostgreSQL-specific statement.
+    #[cfg(feature = "full-ast")]
     Prepare {
         name: Ident,
         data_types: Vec<DataType>,
@@ -3084,6 +3153,7 @@ pub enum Statement {
     ///
     /// See <https://clickhouse.com/docs/ru/sql-reference/statements/kill/>
     /// See <https://dev.mysql.com/doc/refman/8.0/en/kill.html>
+    #[cfg(feature = "full-ast")]
     Kill {
         modifier: Option<KillType>,
         // processlist_id
@@ -3093,6 +3163,7 @@ pub enum Statement {
     /// [EXPLAIN | DESC | DESCRIBE] TABLE
     /// ```
     /// Note: this is a MySQL-specific statement. See <https://dev.mysql.com/doc/refman/8.0/en/explain.html>
+    #[cfg(feature = "full-ast")]
     ExplainTable {
         /// `EXPLAIN | DESC | DESCRIBE`
         describe_alias: DescribeAlias,
@@ -3110,6 +3181,7 @@ pub enum Statement {
     /// ```sql
     /// [EXPLAIN | DESC | DESCRIBE]  <statement>
     /// ```
+    #[cfg(feature = "full-ast")]
     Explain {
         /// `EXPLAIN | DESC | DESCRIBE`
         describe_alias: DescribeAlias,
@@ -3126,10 +3198,12 @@ pub enum Statement {
     /// SAVEPOINT
     /// ```
     /// Define a new savepoint within the current transaction
+    #[cfg(feature = "full-ast")]
     Savepoint { name: Ident },
     /// ```sql
     /// RELEASE [ SAVEPOINT ] savepoint_name
     /// ```
+    #[cfg(feature = "full-ast")]
     ReleaseSavepoint { name: Ident },
     /// A `MERGE` statement.
     ///
@@ -3138,6 +3212,7 @@ pub enum Statement {
     /// ```
     /// [Snowflake](https://docs.snowflake.com/en/sql-reference/sql/merge)
     /// [BigQuery](https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#merge_statement)
+    #[cfg(feature = "full-ast")]
     Merge {
         /// optional INTO keyword
         into: bool,
@@ -3157,6 +3232,7 @@ pub enum Statement {
     /// See [Spark SQL docs] for more details.
     ///
     /// [Spark SQL docs]: https://docs.databricks.com/spark/latest/spark-sql/language-manual/sql-ref-syntax-aux-cache-cache-table.html
+    #[cfg(feature = "full-ast")]
     Cache {
         /// Table flag
         table_flag: Option<ObjectName>,
@@ -3173,6 +3249,7 @@ pub enum Statement {
     /// ```sql
     /// UNCACHE TABLE [ IF EXISTS ]  <table_name>
     /// ```
+    #[cfg(feature = "full-ast")]
     UNCache {
         /// Table name
         #[cfg_attr(feature = "visitor", visit(with = "visit_relation"))]
@@ -3183,6 +3260,7 @@ pub enum Statement {
     /// CREATE [ { TEMPORARY | TEMP } ] SEQUENCE [ IF NOT EXISTS ] <sequence_name>
     /// ```
     /// Define a new sequence:
+    #[cfg(feature = "full-ast")]
     CreateSequence {
         temporary: bool,
         if_not_exists: bool,
@@ -3194,6 +3272,7 @@ pub enum Statement {
     /// ```sql
     /// CREATE TYPE <name>
     /// ```
+    #[cfg(feature = "full-ast")]
     CreateType {
         name: ObjectName,
         representation: UserDefinedTypeRepresentation,
@@ -3201,6 +3280,7 @@ pub enum Statement {
     /// ```sql
     /// PRAGMA <schema-name>.<pragma-name> = <pragma-value>
     /// ```
+    #[cfg(feature = "full-ast")]
     Pragma {
         name: ObjectName,
         value: Option<Value>,
@@ -3210,17 +3290,20 @@ pub enum Statement {
     /// LOCK TABLES <table_name> [READ [LOCAL] | [LOW_PRIORITY] WRITE]
     /// ```
     /// Note: this is a MySQL-specific statement. See <https://dev.mysql.com/doc/refman/8.0/en/lock-tables.html>
+    #[cfg(feature = "full-ast")]
     LockTables { tables: Vec<LockTable> },
     /// ```sql
     /// UNLOCK TABLES
     /// ```
     /// Note: this is a MySQL-specific statement. See <https://dev.mysql.com/doc/refman/8.0/en/lock-tables.html>
+    #[cfg(feature = "full-ast")]
     UnlockTables,
     /// ```sql
     /// UNLOAD(statement) TO <destination> [ WITH options ]
     /// ```
     /// See Redshift <https://docs.aws.amazon.com/redshift/latest/dg/r_UNLOAD.html> and
     // Athena <https://docs.aws.amazon.com/athena/latest/ug/unload.html>
+    #[cfg(feature = "full-ast")]
     Unload {
         query: Box<Query>,
         to: Ident,
@@ -3231,6 +3314,7 @@ pub enum Statement {
     /// ```
     ///
     /// See ClickHouse <https://clickhouse.com/docs/en/sql-reference/statements/optimize>
+    #[cfg(feature = "full-ast")]
     OptimizeTable {
         name: ObjectName,
         on_cluster: Option<Ident>,
@@ -3243,6 +3327,13 @@ pub enum Statement {
 impl fmt::Display for Statement {
     // Clippy thinks this function is too complicated, but it is painful to
     // split up without extracting structs for each `Statement` variant.
+    #[cfg(not(feature = "full-ast"))]
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Statement::Query(query) => query.fmt(f),
+        }
+    }
+    #[cfg(feature = "full-ast")]
     #[allow(clippy::cognitive_complexity)]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {

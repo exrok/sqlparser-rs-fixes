@@ -11,7 +11,7 @@
 // limitations under the License.
 use log::debug;
 
-use crate::ast::{CommentObject, Statement};
+use crate::ast::Statement;
 use crate::dialect::{Dialect, Precedence};
 use crate::keywords::Keyword;
 use crate::parser::{Parser, ParserError};
@@ -168,7 +168,13 @@ impl Dialect for PostgreSqlDialect {
     }
 }
 
+#[cfg(not(feature = "full-ast"))]
+pub fn parse_comment(_parser: &mut Parser) -> Result<Statement, ParserError> {
+    Err(ParserError::unsupported_statement("comment"))
+}
+#[cfg(feature = "full-ast")]
 pub fn parse_comment(parser: &mut Parser) -> Result<Statement, ParserError> {
+    use crate::ast::CommentObject;
     let if_exists = parser.parse_keywords(&[Keyword::IF, Keyword::EXISTS]);
 
     parser.expect_keyword(Keyword::ON)?;

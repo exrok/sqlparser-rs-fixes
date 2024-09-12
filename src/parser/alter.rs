@@ -16,6 +16,7 @@
 use alloc::vec;
 
 use super::{Parser, ParserError};
+#[allow(unused_imports)]
 use crate::{
     ast::{AlterRoleOperation, Expr, Password, ResetConfig, RoleOption, SetConfigValue, Statement},
     dialect::{MsSqlDialect, PostgreSqlDialect},
@@ -35,7 +36,11 @@ impl<'a> Parser<'a> {
             "ALTER ROLE is only support for PostgreSqlDialect, MsSqlDialect".into(),
         ))
     }
-
+    #[cfg(not(feature = "full-ast"))]
+    fn parse_mssql_alter_role(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("full-ast"))
+    }
+    #[cfg(feature = "full-ast")]
     fn parse_mssql_alter_role(&mut self) -> Result<Statement, ParserError> {
         let role_name = self.parse_identifier(false)?;
 
@@ -62,6 +67,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    fn parse_pg_alter_role(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("alter-role"))
+    }
+    #[cfg(feature = "full-ast")]
     fn parse_pg_alter_role(&mut self) -> Result<Statement, ParserError> {
         let role_name = self.parse_identifier(false)?;
 
@@ -145,7 +155,7 @@ impl<'a> Parser<'a> {
             operation,
         })
     }
-
+    #[cfg(feature = "full-ast")]
     fn parse_pg_role_option(&mut self) -> Result<RoleOption, ParserError> {
         let option = match self.parse_one_of_keywords(&[
             Keyword::BYPASSRLS,

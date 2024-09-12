@@ -268,8 +268,9 @@ pub fn expr_from_projection(item: &SelectItem) -> &Expr {
     }
 }
 
-pub fn alter_table_op_with_name(stmt: Statement, expected_name: &str) -> AlterTableOperation {
+pub fn alter_table_op_with_name(stmt: Statement, _expected_name: &str) -> AlterTableOperation {
     match stmt {
+        #[cfg(feature = "full-ast")]
         Statement::AlterTable {
             name,
             if_exists,
@@ -278,7 +279,7 @@ pub fn alter_table_op_with_name(stmt: Statement, expected_name: &str) -> AlterTa
             on_cluster: _,
             location: _,
         } => {
-            assert_eq!(name.to_string(), expected_name);
+            assert_eq!(name.to_string(), _expected_name);
             assert!(!if_exists);
             assert!(!is_only);
             only(operations)

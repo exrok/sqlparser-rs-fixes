@@ -26,6 +26,7 @@ hash-ast = []
 clone-ast = []
 cmp-ast = []
 debug-ast = []
+full-ast = []
 
 [dependencies]
 bigdecimal = { version = "0.4.1", features = ["serde"], optional = true }
@@ -42,6 +43,7 @@ simple_logger = "5.0"
 matches = "0.1"
 pretty_assertions = "1"
 sqlparser = { path = ".", features = [
+    "full-ast",
     "hash-ast",
     "clone-ast",
     "cmp-ast",

@@ -12,14 +12,15 @@
 
 #[cfg(not(feature = "std"))]
 use crate::alloc::string::ToString;
-use crate::ast::helpers::stmt_create_table::CreateTableBuilder;
+#[allow(unused_imports)]
+#[cfg(feature = "full-ast")]
 use crate::ast::helpers::stmt_data_loading::{
     DataLoadingOption, DataLoadingOptionType, DataLoadingOptions, StageLoadSelectItem,
     StageParamsObject,
 };
-use crate::ast::{
-    CommentDef, Ident, ObjectName, RowAccessPolicy, Statement, Tag, WrappedCollection,
-};
+use crate::ast::Statement;
+#[cfg(feature = "full-ast")]
+use crate::ast::{CommentDef, Ident, ObjectName, RowAccessPolicy, Tag, WrappedCollection};
 use crate::dialect::{Dialect, Precedence};
 use crate::keywords::Keyword;
 use crate::parser::{Parser, ParserError};
@@ -168,8 +169,20 @@ impl Dialect for SnowflakeDialect {
     }
 }
 
+#[cfg(not(feature = "full-ast"))]
+pub fn parse_create_table(
+    _or_replace: bool,
+    _global: Option<bool>,
+    _temporary: bool,
+    _volatile: bool,
+    _transient: bool,
+    _parser: &mut Parser,
+) -> Result<Statement, ParserError> {
+    Err(ParserError::unsupported_statement("create_table"))
+}
 /// Parse snowflake create table statement.
 /// <https://docs.snowflake.com/en/sql-reference/sql/create-table>
+#[cfg(feature = "full-ast")]
 pub fn parse_create_table(
     or_replace: bool,
     global: Option<bool>,
@@ -178,6 +191,7 @@ pub fn parse_create_table(
     transient: bool,
     parser: &mut Parser,
 ) -> Result<Statement, ParserError> {
+    use crate::ast::helpers::stmt_create_table::CreateTableBuilder;
     let if_not_exists = parser.parse_keywords(&[Keyword::IF, Keyword::NOT, Keyword::EXISTS]);
     let table_name = parser.parse_object_name(false)?;
 
@@ -358,6 +372,16 @@ pub fn parse_create_table(
     Ok(builder.build())
 }
 
+#[cfg(not(feature = "full-ast"))]
+pub fn parse_create_stage(
+    __or_replace: bool,
+    __temporary: bool,
+    __parser: &mut Parser,
+) -> Result<Statement, ParserError> {
+    Err(ParserError::unsupported_statement("create_stage"))
+}
+
+#[cfg(feature = "full-ast")]
 pub fn parse_create_stage(
     or_replace: bool,
     temporary: bool,
@@ -420,6 +444,7 @@ pub fn parse_create_stage(
     })
 }
 
+#[cfg(feature = "full-ast")]
 pub fn parse_stage_name_identifier(parser: &mut Parser) -> Result<Ident, ParserError> {
     let mut ident = String::new();
     while let Some(next_token) = parser.next_token_no_skip() {
@@ -444,6 +469,7 @@ pub fn parse_stage_name_identifier(parser: &mut Parser) -> Result<Ident, ParserE
     Ok(Ident::new(ident))
 }
 
+#[cfg(feature = "full-ast")]
 pub fn parse_snowflake_stage_name(parser: &mut Parser) -> Result<ObjectName, ParserError> {
     match parser.next_token().token {
         Token::AtSign => {
@@ -464,6 +490,12 @@ pub fn parse_snowflake_stage_name(parser: &mut Parser) -> Result<ObjectName, Par
     }
 }
 
+#[cfg(not(feature = "full-ast"))]
+pub fn parse_copy_into(_parser: &mut Parser) -> Result<Statement, ParserError> {
+    Err(ParserError::unsupported_statement("copy_into"))
+}
+
+#[cfg(feature = "full-ast")]
 pub fn parse_copy_into(parser: &mut Parser) -> Result<Statement, ParserError> {
     let into: ObjectName = parse_snowflake_stage_name(parser)?;
     let mut files: Vec<String> = vec![];
@@ -583,6 +615,7 @@ pub fn parse_copy_into(parser: &mut Parser) -> Result<Statement, ParserError> {
     })
 }
 
+#[cfg(feature = "full-ast")]
 fn parse_select_items_for_data_load(
     parser: &mut Parser,
 ) -> Result<Option<Vec<StageLoadSelectItem>>, ParserError> {
@@ -667,6 +700,7 @@ fn parse_select_items_for_data_load(
     Ok(Some(select_items))
 }
 
+#[cfg(feature = "full-ast")]
 fn parse_stage_params(parser: &mut Parser) -> Result<StageParamsObject, ParserError> {
     let (mut url, mut storage_integration, mut endpoint) = (None, None, None);
     let mut encryption: DataLoadingOptions = DataLoadingOptions { options: vec![] };
@@ -727,6 +761,7 @@ fn parse_stage_params(parser: &mut Parser) -> Result<StageParamsObject, ParserEr
 ///      [ REFRESH_ON_CREATE =  { TRUE | FALSE } ]
 ///      [ NOTIFICATION_INTEGRATION = '<notification_integration_name>' ] )
 ///
+#[cfg(feature = "full-ast")]
 fn parse_parentheses_options(parser: &mut Parser) -> Result<Vec<DataLoadingOption>, ParserError> {
     let mut options: Vec<DataLoadingOption> = Vec::new();
 

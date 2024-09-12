@@ -31,10 +31,14 @@ use recursion::RecursionCounter;
 use IsLateral::*;
 use IsOptional::*;
 
+#[cfg(feature = "full-ast")]
 use crate::ast::helpers::stmt_create_table::{CreateTableBuilder, CreateTableConfiguration};
 use crate::ast::*;
 use crate::dialect::*;
-use crate::keywords::{Keyword, ALL_KEYWORDS};
+use crate::keywords::Keyword;
+
+#[cfg(feature = "full-ast")]
+use crate::keywords::ALL_KEYWORDS;
 use crate::tokenizer::*;
 
 mod alter;
@@ -44,6 +48,13 @@ pub enum ParserError {
     TokenizerError(String),
     ParserError(String),
     RecursionLimitExceeded,
+}
+
+impl ParserError {
+    #[inline(never)]
+    pub fn unsupported_statement(value: &'static str) -> Self {
+        ParserError::ParserError(format!("Unsupported statement: {}", value))
+    }
 }
 
 // avoid clippy type_complexity warnings
@@ -458,6 +469,11 @@ impl<'a> Parser<'a> {
 
     /// Parse a single top-level statement (such as SELECT, INSERT, CREATE, etc.),
     /// stopping before the statement separator, if any.
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_statement(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("statement"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_statement(&mut self) -> Result<Statement, ParserError> {
         let _guard = self.recursion_counter.try_decrease()?;
 
@@ -555,7 +571,11 @@ impl<'a> Parser<'a> {
             _ => self.expected("an SQL statement", next_token),
         }
     }
-
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_flush(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("flush"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_flush(&mut self) -> Result<Statement, ParserError> {
         let mut channel = None;
         let mut tables: Vec<ObjectName> = vec![];
@@ -643,6 +663,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_msck(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("msck"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_msck(&mut self) -> Result<Statement, ParserError> {
         let repair = self.parse_keyword(Keyword::REPAIR);
         self.expect_keyword(Keyword::TABLE)?;
@@ -670,6 +695,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_truncate(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("truncate"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_truncate(&mut self) -> Result<Statement, ParserError> {
         let table = self.parse_keyword(Keyword::TABLE);
         let only = self.parse_keyword(Keyword::ONLY);
@@ -753,6 +783,11 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_attach_duckdb_database(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("attach_duckdb_database"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_attach_duckdb_database(&mut self) -> Result<Statement, ParserError> {
         let database = self.parse_keyword(Keyword::DATABASE);
         let if_not_exists = self.parse_keywords(&[Keyword::IF, Keyword::NOT, Keyword::EXISTS]);
@@ -773,6 +808,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_detach_duckdb_database(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("detach_duckdb_database"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_detach_duckdb_database(&mut self) -> Result<Statement, ParserError> {
         let database = self.parse_keyword(Keyword::DATABASE);
         let if_exists = self.parse_keywords(&[Keyword::IF, Keyword::EXISTS]);
@@ -784,6 +824,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_attach_database(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("attach_database"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_attach_database(&mut self) -> Result<Statement, ParserError> {
         let database = self.parse_keyword(Keyword::DATABASE);
         let database_file_name = self.parse_expr()?;
@@ -796,6 +841,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_analyze(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("analyze"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_analyze(&mut self) -> Result<Statement, ParserError> {
         self.expect_keyword(Keyword::TABLE)?;
         let table_name = self.parse_object_name(false)?;
@@ -920,6 +970,11 @@ impl<'a> Parser<'a> {
         Ok(expr)
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_assert(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("assert"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_assert(&mut self) -> Result<Statement, ParserError> {
         let condition = self.parse_expr()?;
         let message = if self.parse_keyword(Keyword::AS) {
@@ -931,11 +986,21 @@ impl<'a> Parser<'a> {
         Ok(Statement::Assert { condition, message })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_savepoint(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("savepoint"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_savepoint(&mut self) -> Result<Statement, ParserError> {
         let name = self.parse_identifier(false)?;
         Ok(Statement::Savepoint { name })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_release(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("release"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_release(&mut self) -> Result<Statement, ParserError> {
         let _ = self.parse_keyword(Keyword::SAVEPOINT);
         let name = self.parse_identifier(false)?;
@@ -3522,6 +3587,11 @@ impl<'a> Parser<'a> {
     }
 
     /// Parse a SQL CREATE statement
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_create(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("create"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_create(&mut self) -> Result<Statement, ParserError> {
         let or_replace = self.parse_keywords(&[Keyword::OR, Keyword::REPLACE]);
         let or_alter = self.parse_keywords(&[Keyword::OR, Keyword::ALTER]);
@@ -3588,6 +3658,11 @@ impl<'a> Parser<'a> {
     }
 
     /// See [DuckDB Docs](https://duckdb.org/docs/sql/statements/create_secret.html) for more details.
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_create_secret(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("create_secret"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_create_secret(
         &mut self,
         or_replace: bool,
@@ -3647,6 +3722,11 @@ impl<'a> Parser<'a> {
     }
 
     /// Parse a CACHE TABLE statement
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_cache_table(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("cache_table"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_cache_table(&mut self) -> Result<Statement, ParserError> {
         let (mut table_flag, mut options, mut has_as, mut query) = (None, vec![], false, None);
         if self.parse_keyword(Keyword::TABLE) {
@@ -3737,6 +3817,11 @@ impl<'a> Parser<'a> {
     }
 
     /// Parse a UNCACHE TABLE statement
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_uncache_table(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("uncache_table"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_uncache_table(&mut self) -> Result<Statement, ParserError> {
         self.expect_keyword(Keyword::TABLE)?;
         let if_exists = self.parse_keywords(&[Keyword::IF, Keyword::EXISTS]);
@@ -3748,6 +3833,11 @@ impl<'a> Parser<'a> {
     }
 
     /// SQLite-specific `CREATE VIRTUAL TABLE`
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_create_virtual_table(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("create_virtual_table"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_create_virtual_table(&mut self) -> Result<Statement, ParserError> {
         self.expect_keyword(Keyword::TABLE)?;
         let if_not_exists = self.parse_keywords(&[Keyword::IF, Keyword::NOT, Keyword::EXISTS]);
@@ -3767,6 +3857,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_create_schema(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("create_schema"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_create_schema(&mut self) -> Result<Statement, ParserError> {
         let if_not_exists = self.parse_keywords(&[Keyword::IF, Keyword::NOT, Keyword::EXISTS]);
 
@@ -3777,7 +3872,7 @@ impl<'a> Parser<'a> {
             if_not_exists,
         })
     }
-
+    #[cfg(feature = "full-ast")]
     fn parse_schema_name(&mut self) -> Result<SchemaName, ParserError> {
         if self.parse_keyword(Keyword::AUTHORIZATION) {
             Ok(SchemaName::UnnamedAuthorization(
@@ -3797,6 +3892,11 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_create_database(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("create_database"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_create_database(&mut self) -> Result<Statement, ParserError> {
         let ine = self.parse_keywords(&[Keyword::IF, Keyword::NOT, Keyword::EXISTS]);
         let db_name = self.parse_object_name(false)?;
@@ -3841,6 +3941,11 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_create_function(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("create_function"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_create_function(
         &mut self,
         or_replace: bool,
@@ -3859,6 +3964,15 @@ impl<'a> Parser<'a> {
             self.expected("an object type after CREATE", self.peek_token())
         }
     }
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_postgres_create_function(
+        &mut self,
+        _or_replace: bool,
+        _temporary: bool,
+    ) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("merge"))
+    }
+    #[cfg(feature = "full-ast")]
 
     /// Parse `CREATE FUNCTION` for [Postgres]
     ///
@@ -3990,6 +4104,7 @@ impl<'a> Parser<'a> {
     /// Parse `CREATE FUNCTION` for [Hive]
     ///
     /// [Hive]: https://cwiki.apache.org/confluence/display/hive/languagemanual+ddl#LanguageManualDDL-Create/Drop/ReloadFunction
+    #[cfg(feature = "full-ast")]
     fn parse_hive_create_function(
         &mut self,
         or_replace: bool,
@@ -4020,9 +4135,7 @@ impl<'a> Parser<'a> {
         })
     }
 
-    /// Parse `CREATE FUNCTION` for [BigQuery]
-    ///
-    /// [BigQuery]: https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_function_statement
+    #[cfg(feature = "full-ast")]
     fn parse_bigquery_create_function(
         &mut self,
         or_replace: bool,
@@ -4148,6 +4261,11 @@ impl<'a> Parser<'a> {
     /// ```sql
     /// DROP TRIGGER [ IF EXISTS ] name ON table_name [ CASCADE | RESTRICT ]
     /// ```
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_drop_trigger(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("drop_trigger"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_drop_trigger(&mut self) -> Result<Statement, ParserError> {
         if !dialect_of!(self is PostgreSqlDialect | GenericDialect) {
             self.prev_token();
@@ -4172,6 +4290,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_create_trigger(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("create_trigger"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_create_trigger(
         &mut self,
         or_replace: bool,
@@ -4317,6 +4440,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_create_macro(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("create_macro"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_create_macro(
         &mut self,
         or_replace: bool,
@@ -4351,7 +4479,7 @@ impl<'a> Parser<'a> {
             self.expected("an object type after CREATE", self.peek_token())
         }
     }
-
+    #[cfg(feature = "full-ast")]
     fn parse_macro_arg(&mut self) -> Result<MacroArg, ParserError> {
         let name = self.parse_identifier(false)?;
 
@@ -4364,6 +4492,11 @@ impl<'a> Parser<'a> {
         Ok(MacroArg { name, default_expr })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_create_external_table(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("create_external_table"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_create_external_table(
         &mut self,
         or_replace: bool,
@@ -4430,6 +4563,11 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_create_view(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("create_view"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_create_view(
         &mut self,
         or_replace: bool,
@@ -4514,6 +4652,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_create_role(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("create_role"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_create_role(&mut self) -> Result<Statement, ParserError> {
         let if_not_exists = self.parse_keywords(&[Keyword::IF, Keyword::NOT, Keyword::EXISTS]);
         let names = self.parse_comma_separated(|p| p.parse_object_name(false))?;
@@ -4738,6 +4881,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_drop(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("drop"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_drop(&mut self) -> Result<Statement, ParserError> {
         // MySQL dialect supports `TEMPORARY`
         let temporary = dialect_of!(self is MySqlDialect | GenericDialect | DuckDbDialect)
@@ -4805,7 +4953,7 @@ impl<'a> Parser<'a> {
     /// ```sql
     /// DROP FUNCTION [ IF EXISTS ] name [ ( [ [ argmode ] [ argname ] argtype [, ...] ] ) ] [, ...]
     /// [ CASCADE | RESTRICT ]
-    /// ```
+    #[cfg(feature = "full-ast")]
     fn parse_drop_function(&mut self) -> Result<Statement, ParserError> {
         let if_exists = self.parse_keywords(&[Keyword::IF, Keyword::EXISTS]);
         let func_desc = self.parse_comma_separated(Parser::parse_function_desc)?;
@@ -4825,6 +4973,7 @@ impl<'a> Parser<'a> {
     /// DROP PROCEDURE [ IF EXISTS ] name [ ( [ [ argmode ] [ argname ] argtype [, ...] ] ) ] [, ...]
     /// [ CASCADE | RESTRICT ]
     /// ```
+    #[cfg(feature = "full-ast")]
     fn parse_drop_procedure(&mut self) -> Result<Statement, ParserError> {
         let if_exists = self.parse_keywords(&[Keyword::IF, Keyword::EXISTS]);
         let proc_desc = self.parse_comma_separated(Parser::parse_function_desc)?;
@@ -4860,6 +5009,7 @@ impl<'a> Parser<'a> {
     }
 
     /// See [DuckDB Docs](https://duckdb.org/docs/sql/statements/create_secret.html) for more details.
+    #[cfg(feature = "full-ast")]
     fn parse_drop_secret(
         &mut self,
         temporary: bool,
@@ -4896,6 +5046,11 @@ impl<'a> Parser<'a> {
     ///
     /// The syntax can vary significantly between warehouses. See the grammar
     /// on the warehouse specific function in such cases.
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_declare(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("declare"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_declare(&mut self) -> Result<Statement, ParserError> {
         if dialect_of!(self is BigQueryDialect) {
             return self.parse_big_query_declare();
@@ -4967,6 +5122,11 @@ impl<'a> Parser<'a> {
     /// DECLARE variable_name[, ...] [{ <variable_type> | <DEFAULT expression> }];
     /// ```
     /// [BigQuery]: https://cloud.google.com/bigquery/docs/reference/standard-sql/procedural-language#declare
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_big_query_declare(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("big_query_declare"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_big_query_declare(&mut self) -> Result<Statement, ParserError> {
         let names = self.parse_comma_separated(|parser| Parser::parse_identifier(parser, false))?;
 
@@ -5027,6 +5187,11 @@ impl<'a> Parser<'a> {
     /// ```
     ///
     /// [Snowflake]: https://docs.snowflake.com/en/sql-reference/snowflake-scripting/declare
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_snowflake_declare(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("snowflake_declare"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_snowflake_declare(&mut self) -> Result<Statement, ParserError> {
         let mut stmts = vec![];
         loop {
@@ -5130,6 +5295,11 @@ impl<'a> Parser<'a> {
     // } [ ,...n ]
     /// ```
     /// [MsSql]: https://learn.microsoft.com/en-us/sql/t-sql/language-elements/declare-local-variable-transact-sql?view=sql-server-ver16
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_mssql_declare(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("mssql_declare"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_mssql_declare(&mut self) -> Result<Statement, ParserError> {
         let mut stmts = vec![];
 
@@ -5228,6 +5398,11 @@ impl<'a> Parser<'a> {
     }
 
     // FETCH [ direction { FROM | IN } ] cursor INTO target;
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_fetch_statement(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("fetch_statement"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_fetch_statement(&mut self) -> Result<Statement, ParserError> {
         let direction = if self.parse_keyword(Keyword::NEXT) {
             FetchDirection::Next
@@ -5288,6 +5463,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_discard(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("discard"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_discard(&mut self) -> Result<Statement, ParserError> {
         let object_type = if self.parse_keyword(Keyword::ALL) {
             DiscardObject::ALL
@@ -5306,6 +5486,11 @@ impl<'a> Parser<'a> {
         Ok(Statement::Discard { object_type })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_create_index(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("create_index"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_create_index(&mut self, unique: bool) -> Result<Statement, ParserError> {
         let concurrently = self.parse_keyword(Keyword::CONCURRENTLY);
         let if_not_exists = self.parse_keywords(&[Keyword::IF, Keyword::NOT, Keyword::EXISTS]);
@@ -5375,6 +5560,11 @@ impl<'a> Parser<'a> {
         }))
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_create_extension(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("create_extension"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_create_extension(&mut self) -> Result<Statement, ParserError> {
         let if_not_exists = self.parse_keywords(&[Keyword::IF, Keyword::NOT, Keyword::EXISTS]);
         let name = self.parse_identifier(false)?;
@@ -5563,7 +5753,7 @@ impl<'a> Parser<'a> {
             }
         }
     }
-
+    #[cfg(feature = "full-ast")]
     fn parse_optional_on_cluster(&mut self) -> Result<Option<Ident>, ParserError> {
         if self.parse_keywords(&[Keyword::ON, Keyword::CLUSTER]) {
             Ok(Some(self.parse_identifier(false)?))
@@ -5572,6 +5762,11 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_create_table(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("create_table"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_create_table(
         &mut self,
         or_replace: bool,
@@ -5775,6 +5970,7 @@ impl<'a> Parser<'a> {
     ///
     /// [BigQuery](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#syntax_2)
     /// [PostgreSQL](https://www.postgresql.org/docs/current/ddl-partitioning.html)
+    #[cfg(feature = "full-ast")]
     fn parse_optional_create_table_config(
         &mut self,
     ) -> Result<CreateTableConfiguration, ParserError> {
@@ -6986,6 +7182,11 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_alter(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("alter"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_alter(&mut self) -> Result<Statement, ParserError> {
         let object_type = self.expect_one_of_keywords(&[
             Keyword::VIEW,
@@ -7048,6 +7249,11 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_alter_view(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("alter_view"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_alter_view(&mut self) -> Result<Statement, ParserError> {
         let name = self.parse_object_name(false)?;
         let columns = self.parse_parenthesized_column_list(Optional, false)?;
@@ -7067,6 +7273,11 @@ impl<'a> Parser<'a> {
 
     /// Parse a `CALL procedure_name(arg1, arg2, ...)`
     /// or `CALL procedure_name` statement
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_call(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("call"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_call(&mut self) -> Result<Statement, ParserError> {
         let object_name = self.parse_object_name(false)?;
         if self.peek_token().token == Token::LParen {
@@ -7091,6 +7302,11 @@ impl<'a> Parser<'a> {
     }
 
     /// Parse a copy statement
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_copy(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("copy"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_copy(&mut self) -> Result<Statement, ParserError> {
         let source;
         if self.consume_token(&Token::LParen) {
@@ -7157,6 +7373,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_close(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("close"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_close(&mut self) -> Result<Statement, ParserError> {
         let cursor = if self.parse_keyword(Keyword::ALL) {
             CloseCursor::All
@@ -7169,6 +7390,7 @@ impl<'a> Parser<'a> {
         Ok(Statement::Close { cursor })
     }
 
+    #[cfg(feature = "full-ast")]
     fn parse_copy_option(&mut self) -> Result<CopyOption, ParserError> {
         let ret = match self.parse_one_of_keywords(&[
             Keyword::FORMAT,
@@ -7211,6 +7433,7 @@ impl<'a> Parser<'a> {
         Ok(ret)
     }
 
+    #[cfg(feature = "full-ast")]
     fn parse_copy_legacy_option(&mut self) -> Result<CopyLegacyOption, ParserError> {
         let ret = match self.parse_one_of_keywords(&[
             Keyword::BINARY,
@@ -7241,6 +7464,7 @@ impl<'a> Parser<'a> {
         Ok(ret)
     }
 
+    #[cfg(feature = "full-ast")]
     fn parse_copy_legacy_csv_option(&mut self) -> Result<CopyLegacyCsvOption, ParserError> {
         let ret = match self.parse_one_of_keywords(&[
             Keyword::HEADER,
@@ -7272,6 +7496,7 @@ impl<'a> Parser<'a> {
         Ok(ret)
     }
 
+    #[cfg(feature = "full-ast")]
     fn parse_literal_char(&mut self) -> Result<char, ParserError> {
         let s = self.parse_literal_string()?;
         if s.len() != 1 {
@@ -7452,6 +7677,7 @@ impl<'a> Parser<'a> {
 
     /// Parse the body of a `CREATE FUNCTION` specified as a string.
     /// e.g. `CREATE FUNCTION ... AS $$ body $$`.
+    #[cfg(feature = "full-ast")]
     fn parse_create_function_body_string(&mut self) -> Result<Expr, ParserError> {
         let peek_token = self.peek_token();
         match peek_token.token {
@@ -8155,6 +8381,7 @@ impl<'a> Parser<'a> {
     }
 
     /// Parses a parenthesized, comma-separated list of column definitions within a view.
+    #[cfg(feature = "full-ast")]
     fn parse_view_columns(&mut self) -> Result<Vec<ViewColumnDef>, ParserError> {
         if self.consume_token(&Token::LParen) {
             if self.peek_token().token == Token::RParen {
@@ -8171,6 +8398,7 @@ impl<'a> Parser<'a> {
     }
 
     /// Parses a column definition within a view.
+    #[cfg(feature = "full-ast")]
     fn parse_view_column(&mut self) -> Result<ViewColumnDef, ParserError> {
         let name = self.parse_identifier(false)?;
         let options = if dialect_of!(self is BigQueryDialect | GenericDialect)
@@ -8355,6 +8583,11 @@ impl<'a> Parser<'a> {
         Ok(parent_type(inside_type.into()))
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_delete(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("delete"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_delete(&mut self) -> Result<Statement, ParserError> {
         let (tables, with_from_keyword) = if !self.parse_keyword(Keyword::FROM) {
             // `FROM` keyword is optional in BigQuery SQL.
@@ -8413,6 +8646,11 @@ impl<'a> Parser<'a> {
     }
 
     // KILL [CONNECTION | QUERY | MUTATION] processlist_id
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_kill(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("kill"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_kill(&mut self) -> Result<Statement, ParserError> {
         let modifier_keyword =
             self.parse_one_of_keywords(&[Keyword::CONNECTION, Keyword::QUERY, Keyword::MUTATION]);
@@ -8438,6 +8676,11 @@ impl<'a> Parser<'a> {
         Ok(Statement::Kill { modifier, id })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_explain(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("explain"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_explain(
         &mut self,
         describe_alias: DescribeAlias,
@@ -9175,6 +9418,11 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_set(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("set"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_set(&mut self) -> Result<Statement, ParserError> {
         let modifier =
             self.parse_one_of_keywords(&[Keyword::SESSION, Keyword::LOCAL, Keyword::HIVEVAR]);
@@ -9310,6 +9558,11 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_show(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("show"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_show(&mut self) -> Result<Statement, ParserError> {
         let extended = self.parse_keyword(Keyword::EXTENDED);
         let full = self.parse_keyword(Keyword::FULL);
@@ -9355,6 +9608,11 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_show_create(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("show_create"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_show_create(&mut self) -> Result<Statement, ParserError> {
         let obj_type = match self.expect_one_of_keywords(&[
             Keyword::TABLE,
@@ -9380,6 +9638,11 @@ impl<'a> Parser<'a> {
         Ok(Statement::ShowCreate { obj_type, obj_name })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_show_columns(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("show_columns"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_show_columns(
         &mut self,
         extended: bool,
@@ -9405,6 +9668,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_show_tables(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("show_tables"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_show_tables(
         &mut self,
         extended: bool,
@@ -9423,11 +9691,21 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_show_functions(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("show_functions"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_show_functions(&mut self) -> Result<Statement, ParserError> {
         let filter = self.parse_show_statement_filter()?;
         Ok(Statement::ShowFunctions { filter })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_show_collation(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("show_collation"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_show_collation(&mut self) -> Result<Statement, ParserError> {
         let filter = self.parse_show_statement_filter()?;
         Ok(Statement::ShowCollation { filter })
@@ -9451,6 +9729,11 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_use(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("use"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_use(&mut self) -> Result<Statement, ParserError> {
         // Determine which keywords are recognized by the current dialect
         let parsed_keyword = if dialect_of!(self is HiveDialect) {
@@ -10316,6 +10599,11 @@ impl<'a> Parser<'a> {
     }
 
     /// Parse a GRANT statement.
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_grant(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("grant"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_grant(&mut self) -> Result<Statement, ParserError> {
         let (privileges, objects) = self.parse_grant_revoke_privileges_objects()?;
 
@@ -10447,6 +10735,11 @@ impl<'a> Parser<'a> {
     }
 
     /// Parse a REVOKE statement
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_revoke(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("revoke"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_revoke(&mut self) -> Result<Statement, ParserError> {
         let (privileges, objects) = self.parse_grant_revoke_privileges_objects()?;
 
@@ -10474,6 +10767,11 @@ impl<'a> Parser<'a> {
     }
 
     /// Parse an REPLACE statement
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_replace(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("replace"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_replace(&mut self) -> Result<Statement, ParserError> {
         if !dialect_of!(self is MySqlDialect | GenericDialect) {
             return parser_err!("Unsupported statement REPLACE", self.peek_token().location);
@@ -10495,6 +10793,11 @@ impl<'a> Parser<'a> {
     }
 
     /// Parse an INSERT statement
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_insert(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("insert"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_insert(&mut self) -> Result<Statement, ParserError> {
         let or = if !dialect_of!(self is SQLiteDialect) {
             None
@@ -10690,6 +10993,11 @@ impl<'a> Parser<'a> {
         Ok(Box::new(SetExpr::Update(self.parse_update()?)))
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_update(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("update"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_update(&mut self) -> Result<Statement, ParserError> {
         let table = self.parse_table_and_joins()?;
         self.expect_keyword(Keyword::SET)?;
@@ -11319,6 +11627,11 @@ impl<'a> Parser<'a> {
         Ok(Values { explicit_row, rows })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_start_transaction(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("start_transaction"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_start_transaction(&mut self) -> Result<Statement, ParserError> {
         self.expect_keyword(Keyword::TRANSACTION)?;
         Ok(Statement::StartTransaction {
@@ -11328,6 +11641,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_begin(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("begin"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_begin(&mut self) -> Result<Statement, ParserError> {
         let modifier = if !self.dialect.supports_start_transaction_modifier() {
             None
@@ -11348,6 +11666,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_end(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("end"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_end(&mut self) -> Result<Statement, ParserError> {
         Ok(Statement::Commit {
             chain: self.parse_commit_rollback_chain()?,
@@ -11390,12 +11713,22 @@ impl<'a> Parser<'a> {
         Ok(modes)
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_commit(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("commit"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_commit(&mut self) -> Result<Statement, ParserError> {
         Ok(Statement::Commit {
             chain: self.parse_commit_rollback_chain()?,
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_rollback(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("rollback"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_rollback(&mut self) -> Result<Statement, ParserError> {
         let chain = self.parse_commit_rollback_chain()?;
         let savepoint = self.parse_rollback_savepoint()?;
@@ -11425,12 +11758,22 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_deallocate(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("deallocate"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_deallocate(&mut self) -> Result<Statement, ParserError> {
         let prepare = self.parse_keyword(Keyword::PREPARE);
         let name = self.parse_identifier(false)?;
         Ok(Statement::Deallocate { name, prepare })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_execute(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("execute"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_execute(&mut self) -> Result<Statement, ParserError> {
         let name = self.parse_identifier(false)?;
 
@@ -11456,6 +11799,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_prepare(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("prepare"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_prepare(&mut self) -> Result<Statement, ParserError> {
         let name = self.parse_identifier(false)?;
 
@@ -11474,6 +11822,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_unload(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("unload"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_unload(&mut self) -> Result<Statement, ParserError> {
         self.expect_token(&Token::LParen)?;
         let query = self.parse_boxed_query()?;
@@ -11591,6 +11944,11 @@ impl<'a> Parser<'a> {
         Ok(clauses)
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_merge(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("merge"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_merge(&mut self) -> Result<Statement, ParserError> {
         let into = self.parse_keyword(Keyword::INTO);
 
@@ -11611,6 +11969,7 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(feature = "full-ast")]
     fn parse_pragma_value(&mut self) -> Result<Value, ParserError> {
         match self.parse_value()? {
             v @ Value::SingleQuotedString(_) => Ok(v),
@@ -11625,6 +11984,11 @@ impl<'a> Parser<'a> {
     }
 
     // PRAGMA [schema-name '.'] pragma-name [('=' pragma-value) | '(' pragma-value ')']
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_pragma(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("pragma"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_pragma(&mut self) -> Result<Statement, ParserError> {
         let name = self.parse_object_name(false)?;
         if self.consume_token(&Token::LParen) {
@@ -11651,6 +12015,11 @@ impl<'a> Parser<'a> {
     }
 
     /// `INSTALL [extension_name]`
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_install(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("install"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_install(&mut self) -> Result<Statement, ParserError> {
         let extension_name = self.parse_identifier(false)?;
 
@@ -11658,6 +12027,11 @@ impl<'a> Parser<'a> {
     }
 
     /// `LOAD [extension_name]`
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_load(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("load"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_load(&mut self) -> Result<Statement, ParserError> {
         let extension_name = self.parse_identifier(false)?;
         Ok(Statement::Load { extension_name })
@@ -11667,6 +12041,11 @@ impl<'a> Parser<'a> {
     /// OPTIMIZE TABLE [db.]name [ON CLUSTER cluster] [PARTITION partition | PARTITION ID 'partition_id'] [FINAL] [DEDUPLICATE [BY expression]]
     /// ```
     /// [ClickHouse](https://clickhouse.com/docs/en/sql-reference/statements/optimize)
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_optimize_table(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("optimize_table"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_optimize_table(&mut self) -> Result<Statement, ParserError> {
         self.expect_keyword(Keyword::TABLE)?;
         let name = self.parse_object_name(false)?;
@@ -11707,6 +12086,11 @@ impl<'a> Parser<'a> {
     /// ```
     ///
     /// See [Postgres docs](https://www.postgresql.org/docs/current/sql-createsequence.html) for more details.
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_create_sequence(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("create_sequence"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_create_sequence(&mut self, temporary: bool) -> Result<Statement, ParserError> {
         //[ IF NOT EXISTS ]
         let if_not_exists = self.parse_keywords(&[Keyword::IF, Keyword::NOT, Keyword::EXISTS]);
@@ -11821,6 +12205,11 @@ impl<'a> Parser<'a> {
         Ok(NamedWindowDefinition(ident, window_expr))
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_create_procedure(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("create_procedure"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_create_procedure(&mut self, or_alter: bool) -> Result<Statement, ParserError> {
         let name = self.parse_object_name(false)?;
         let params = self.parse_optional_procedure_parameters()?;
@@ -11868,6 +12257,11 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(not(feature = "full-ast"))]
+    pub fn parse_create_type(&mut self) -> Result<Statement, ParserError> {
+        Err(ParserError::unsupported_statement("create_type"))
+    }
+    #[cfg(feature = "full-ast")]
     pub fn parse_create_type(&mut self) -> Result<Statement, ParserError> {
         let name = self.parse_object_name(false)?;
         self.expect_keyword(Keyword::AS)?;
@@ -12351,6 +12745,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "full-ast")]
     fn test_parse_schema_name() {
         // The expected name should be identical as the input name, that's why I don't receive both
         macro_rules! test_parse_schema_name {
@@ -12605,6 +13000,7 @@ mod tests {
 
         let ast: Vec<Statement> = Parser::parse_sql(&MySqlDialect {}, sql).unwrap();
         assert_eq!(ast.len(), 1);
+        #[allow(irrefutable_let_patterns)]
         if let Statement::Query(v) = &ast[0] {
             if let SetExpr::Select(select) = &*v.body {
                 assert_eq!(select.from.len(), 1);
