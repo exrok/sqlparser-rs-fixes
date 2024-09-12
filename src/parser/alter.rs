@@ -18,11 +18,14 @@ use alloc::vec;
 use super::{Parser, ParserError};
 #[allow(unused_imports)]
 use crate::{
-    ast::{AlterRoleOperation, Expr, Password, ResetConfig, RoleOption, SetConfigValue, Statement},
+    ast::{Expr, Password, Statement},
     dialect::{MsSqlDialect, PostgreSqlDialect},
     keywords::Keyword,
     tokenizer::Token,
 };
+
+#[cfg(feature = "full-ast")]
+use crate::ast::{AlterRoleOperation, ResetConfig, RoleOption, SetConfigValue};
 
 impl<'a> Parser<'a> {
     pub fn parse_alter_role(&mut self) -> Result<Statement, ParserError> {

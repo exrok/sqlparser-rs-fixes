@@ -268,6 +268,7 @@ pub fn expr_from_projection(item: &SelectItem) -> &Expr {
     }
 }
 
+#[cfg(feature = "full-ast")]
 pub fn alter_table_op_with_name(stmt: Statement, _expected_name: &str) -> AlterTableOperation {
     match stmt {
         #[cfg(feature = "full-ast")]
@@ -288,6 +289,7 @@ pub fn alter_table_op_with_name(stmt: Statement, _expected_name: &str) -> AlterT
     }
 }
 
+#[cfg(feature = "full-ast")]
 pub fn alter_table_op(stmt: Statement) -> AlterTableOperation {
     alter_table_op_with_name(stmt, "tab")
 }

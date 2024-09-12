@@ -4225,6 +4225,7 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(feature = "full-ast")]
     fn parse_function_arg(&mut self) -> Result<OperateFunctionArg, ParserError> {
         let mode = if self.parse_keyword(Keyword::IN) {
             Some(ArgMode::In)
@@ -4365,6 +4366,7 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(feature = "full-ast")]
     pub fn parse_trigger_period(&mut self) -> Result<TriggerPeriod, ParserError> {
         Ok(
             match self.expect_one_of_keywords(&[
@@ -4382,6 +4384,7 @@ impl<'a> Parser<'a> {
         )
     }
 
+    #[cfg(feature = "full-ast")]
     pub fn parse_trigger_event(&mut self) -> Result<TriggerEvent, ParserError> {
         Ok(
             match self.expect_one_of_keywords(&[
@@ -4408,6 +4411,7 @@ impl<'a> Parser<'a> {
         )
     }
 
+    #[cfg(feature = "full-ast")]
     pub fn parse_trigger_referencing(&mut self) -> Result<Option<TriggerReferencing>, ParserError> {
         let refer_type = match self.parse_one_of_keywords(&[Keyword::OLD, Keyword::NEW]) {
             Some(Keyword::OLD) if self.parse_keyword(Keyword::TABLE) => {
@@ -4430,6 +4434,7 @@ impl<'a> Parser<'a> {
         }))
     }
 
+    #[cfg(feature = "full-ast")]
     pub fn parse_trigger_exec_body(&mut self) -> Result<TriggerExecBody, ParserError> {
         Ok(TriggerExecBody {
             exec_type: match self
@@ -4993,6 +4998,7 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(feature = "full-ast")]
     fn parse_function_desc(&mut self) -> Result<FunctionDesc, ParserError> {
         let name = self.parse_object_name(false)?;
 
@@ -5602,6 +5608,7 @@ impl<'a> Parser<'a> {
     }
 
     //TODO: Implement parsing for Skewed
+    #[cfg(feature = "full-ast")]
     pub fn parse_hive_distribution(&mut self) -> Result<HiveDistributionStyle, ParserError> {
         if self.parse_keywords(&[Keyword::PARTITIONED, Keyword::BY]) {
             self.expect_token(&Token::LParen)?;
@@ -6008,6 +6015,7 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(feature = "full-ast")]
     pub fn parse_optional_procedure_parameters(
         &mut self,
     ) -> Result<Option<Vec<ProcedureParam>>, ParserError> {
@@ -6030,6 +6038,7 @@ impl<'a> Parser<'a> {
         Ok(Some(params))
     }
 
+    #[cfg(feature = "full-ast")]
     pub fn parse_columns(&mut self) -> Result<(Vec<ColumnDef>, Vec<TableConstraint>), ParserError> {
         let mut columns = vec![];
         let mut constraints = vec![];
@@ -6062,12 +6071,14 @@ impl<'a> Parser<'a> {
         Ok((columns, constraints))
     }
 
+    #[cfg(feature = "full-ast")]
     pub fn parse_procedure_param(&mut self) -> Result<ProcedureParam, ParserError> {
         let name = self.parse_identifier(false)?;
         let data_type = self.parse_data_type()?;
         Ok(ProcedureParam { name, data_type })
     }
 
+    #[cfg(feature = "full-ast")]
     pub fn parse_column_def(&mut self) -> Result<ColumnDef, ParserError> {
         let name = self.parse_identifier(false)?;
         let data_type = if self.is_column_type_sqlite_unspecified() {
@@ -6110,6 +6121,7 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(feature = "full-ast")]
     fn is_column_type_sqlite_unspecified(&mut self) -> bool {
         if dialect_of!(self is SQLiteDialect) {
             match self.peek_token().token {
@@ -6133,6 +6145,7 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(feature = "full-ast")]
     pub fn parse_optional_column_option(&mut self) -> Result<Option<ColumnOption>, ParserError> {
         if self.parse_keywords(&[Keyword::CHARACTER, Keyword::SET]) {
             Ok(Some(ColumnOption::CharacterSet(
@@ -6248,6 +6261,7 @@ impl<'a> Parser<'a> {
             Ok(None)
         }
     }
+    #[cfg(feature = "full-ast")]
     fn parse_optional_column_option_generated(
         &mut self,
     ) -> Result<Option<ColumnOption>, ParserError> {
@@ -6315,6 +6329,7 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(feature = "full-ast")]
     fn parse_optional_column_option_as(&mut self) -> Result<Option<ColumnOption>, ParserError> {
         // Some DBs allow 'AS (expr)', shorthand for GENERATED ALWAYS AS
         self.expect_token(&Token::LParen)?;
@@ -6341,6 +6356,7 @@ impl<'a> Parser<'a> {
         }))
     }
 
+    #[cfg(feature = "full-ast")]
     pub fn parse_optional_clustered_by(&mut self) -> Result<Option<ClusteredBy>, ParserError> {
         let clustered_by = if dialect_of!(self is HiveDialect|GenericDialect)
             && self.parse_keywords(&[Keyword::CLUSTERED, Keyword::BY])
@@ -6370,6 +6386,7 @@ impl<'a> Parser<'a> {
         Ok(clustered_by)
     }
 
+    #[cfg(feature = "full-ast")]
     pub fn parse_referential_action(&mut self) -> Result<ReferentialAction, ParserError> {
         if self.parse_keyword(Keyword::RESTRICT) {
             Ok(ReferentialAction::Restrict)
@@ -6389,6 +6406,7 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(feature = "full-ast")]
     pub fn parse_constraint_characteristics(
         &mut self,
     ) -> Result<Option<ConstraintCharacteristics>, ParserError> {
@@ -6426,6 +6444,7 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(feature = "full-ast")]
     pub fn parse_optional_table_constraint(
         &mut self,
     ) -> Result<Option<TableConstraint>, ParserError> {
@@ -6620,6 +6639,7 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(feature = "full-ast")]
     pub fn parse_index_type(&mut self) -> Result<IndexType, ParserError> {
         if self.parse_keyword(Keyword::BTREE) {
             Ok(IndexType::BTree)
@@ -6631,6 +6651,7 @@ impl<'a> Parser<'a> {
     }
 
     /// Parse [USING {BTREE | HASH}]
+    #[cfg(feature = "full-ast")]
     pub fn parse_optional_using_then_index_type(
         &mut self,
     ) -> Result<Option<IndexType>, ParserError> {
@@ -6648,6 +6669,7 @@ impl<'a> Parser<'a> {
     }
 
     #[must_use]
+    #[cfg(feature = "full-ast")]
     pub fn parse_index_type_display(&mut self) -> KeyOrIndexDisplay {
         if self.parse_keyword(Keyword::KEY) {
             KeyOrIndexDisplay::Key
@@ -6658,6 +6680,7 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(feature = "full-ast")]
     pub fn parse_optional_index_option(&mut self) -> Result<Option<IndexOption>, ParserError> {
         if let Some(index_type) = self.parse_optional_using_then_index_type()? {
             Ok(Some(IndexOption::Using(index_type)))
@@ -6669,6 +6692,7 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[cfg(feature = "full-ast")]
     pub fn parse_index_options(&mut self) -> Result<Vec<IndexOption>, ParserError> {
         let mut options = Vec::new();
 
@@ -6768,6 +6792,7 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(feature = "full-ast")]
     pub fn parse_partition(&mut self) -> Result<Partition, ParserError> {
         self.expect_token(&Token::LParen)?;
         let partitions = self.parse_comma_separated(Parser::parse_expr)?;
@@ -6788,6 +6813,7 @@ impl<'a> Parser<'a> {
             order_by,
         })
     }
+    #[cfg(feature = "full-ast")]
     pub fn parse_alter_table_add_projection(&mut self) -> Result<AlterTableOperation, ParserError> {
         let if_not_exists = self.parse_keywords(&[Keyword::IF, Keyword::NOT, Keyword::EXISTS]);
         let name = self.parse_identifier(false)?;
@@ -6799,6 +6825,7 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(feature = "full-ast")]
     pub fn parse_alter_table_operation(&mut self) -> Result<AlterTableOperation, ParserError> {
         let operation = if self.parse_keyword(Keyword::ADD) {
             if let Some(constraint) = self.parse_optional_table_constraint()? {
@@ -7175,6 +7202,7 @@ impl<'a> Parser<'a> {
         Ok(operation)
     }
 
+    #[cfg(feature = "full-ast")]
     fn parse_part_or_partition(&mut self) -> Result<Partition, ParserError> {
         let keyword = self.expect_one_of_keywords(&[Keyword::PART, Keyword::PARTITION])?;
         match keyword {
@@ -7991,6 +8019,7 @@ impl<'a> Parser<'a> {
                         Box::new(value_data_type),
                     ))
                 }
+                #[cfg(feature = "full-ast")]
                 Keyword::NESTED if dialect_of!(self is ClickHouseDialect | GenericDialect) => {
                     self.expect_token(&Token::LParen)?;
                     let field_defs = self.parse_comma_separated(Parser::parse_column_def)?;
@@ -12125,6 +12154,7 @@ impl<'a> Parser<'a> {
         })
     }
 
+    #[cfg(feature = "full-ast")]
     fn parse_create_sequence_options(&mut self) -> Result<Vec<SequenceOptions>, ParserError> {
         let mut sequence_options = vec![];
         //[ INCREMENT [ BY ] increment ]
@@ -12312,6 +12342,7 @@ impl<'a> Parser<'a> {
         Ok(partitions)
     }
 
+    #[cfg(feature = "full-ast")]
     fn parse_column_position(&mut self) -> Result<Option<MySQLColumnPosition>, ParserError> {
         if dialect_of!(self is MySqlDialect | GenericDialect) {
             if self.parse_keyword(Keyword::FIRST) {

@@ -32,7 +32,9 @@ pub use self::data_type::{
     ArrayElemTypeDef, CharLengthUnits, CharacterLength, DataType, ExactNumberInfo,
     StructBracketKind, TimezoneInfo,
 };
+#[cfg(feature = "full-ast")]
 pub use self::dcl::{AlterRoleOperation, ResetConfig, RoleOption, SetConfigValue, Use};
+#[cfg(feature = "full-ast")]
 pub use self::ddl::{
     AlterColumnOperation, AlterIndexOperation, AlterTableOperation, ClusteredBy, ColumnDef,
     ColumnOption, ColumnOptionDef, ConstraintCharacteristics, Deduplicate, DeferrableInitial,
@@ -40,6 +42,7 @@ pub use self::ddl::{
     Partition, ProcedureParam, ReferentialAction, TableConstraint,
     UserDefinedTypeCompositeAttributeDef, UserDefinedTypeRepresentation, ViewColumnDef,
 };
+#[cfg(feature = "full-ast")]
 pub use self::dml::{CreateIndex, CreateTable, Delete, Insert};
 pub use self::operator::{BinaryOperator, UnaryOperator};
 pub use self::query::{
@@ -56,6 +59,7 @@ pub use self::query::{
     ValueTableMode, Values, WildcardAdditionalOptions, With, WithFill,
 };
 
+#[cfg(feature = "full-ast")]
 pub use self::trigger::{
     TriggerEvent, TriggerExecBody, TriggerExecBodyType, TriggerObject, TriggerPeriod,
     TriggerReferencing, TriggerReferencingType,
@@ -74,12 +78,16 @@ use crate::ast::helpers::stmt_data_loading::{
 pub use visitor::*;
 
 mod data_type;
+#[cfg(feature = "full-ast")]
 mod dcl;
+#[cfg(feature = "full-ast")]
 mod ddl;
+#[cfg(feature = "full-ast")]
 mod dml;
 pub mod helpers;
 mod operator;
 mod query;
+#[cfg(feature = "full-ast")]
 mod trigger;
 mod value;
 
@@ -5877,6 +5885,7 @@ impl fmt::Display for KillType {
 #[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
+#[cfg(feature = "full-ast")]
 pub enum HiveDistributionStyle {
     PARTITIONED {
         columns: Vec<ColumnDef>,

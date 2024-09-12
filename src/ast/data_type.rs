@@ -22,13 +22,12 @@ use sqlparser_derive::{Visit, VisitMut};
 
 use crate::ast::{display_comma_separated, ObjectName, StructField, UnionField};
 
-use super::{value::escape_single_quote_string, ColumnDef};
+use super::value::escape_single_quote_string;
 
 /// SQL data types
 #[cfg_attr(feature = "clone-ast", derive(Clone))]
 #[cfg_attr(feature = "debug-ast", derive(Debug))]
 #[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
-
 #[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
@@ -297,7 +296,8 @@ pub enum DataType {
     /// Nested
     ///
     /// [clickhouse]: https://clickhouse.com/docs/en/sql-reference/data-types/nested-data-structures/nested
-    Nested(Vec<ColumnDef>),
+    #[cfg(feature = "full-ast")]
+    Nested(Vec<super::ColumnDef>),
     /// Enums
     Enum(Vec<String>),
     /// Set
@@ -554,6 +554,7 @@ impl fmt::Display for DataType {
             DataType::Tuple(fields) => {
                 write!(f, "Tuple({})", display_comma_separated(fields))
             }
+            #[cfg(feature = "full-ast")]
             DataType::Nested(fields) => {
                 write!(f, "Nested({})", display_comma_separated(fields))
             }
@@ -633,7 +634,6 @@ fn format_clickhouse_datetime_precision_and_timezone(
 #[cfg_attr(feature = "clone-ast", derive(Clone))]
 #[cfg_attr(feature = "debug-ast", derive(Debug))]
 #[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
-
 #[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
@@ -791,7 +791,6 @@ impl fmt::Display for CharLengthUnits {
 #[cfg_attr(feature = "clone-ast", derive(Clone))]
 #[cfg_attr(feature = "debug-ast", derive(Debug))]
 #[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq, PartialOrd, Ord))]
-
 #[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
