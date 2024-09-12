@@ -485,9 +485,9 @@ impl fmt::Display for JsonPath {
             match elem {
                 JsonPathElem::Dot { key, quoted } => {
                     if i == 0 {
-                        write!(f, ":")?;
+                        f.write_str(":")?;
                     } else {
-                        write!(f, ".")?;
+                        f.write_str(".")?;
                     }
 
                     if *quoted {
@@ -1015,12 +1015,12 @@ impl fmt::Display for Subscript {
                 if let Some(lower) = lower_bound {
                     write!(f, "{lower}")?;
                 }
-                write!(f, ":")?;
+                f.write_str(":")?;
                 if let Some(upper) = upper_bound {
                     write!(f, "{upper}")?;
                 }
                 if let Some(stride) = stride {
-                    write!(f, ":")?;
+                    f.write_str(":")?;
                     write!(f, "{stride}")?;
                 }
                 Ok(())
@@ -1396,7 +1396,7 @@ impl fmt::Display for Expr {
                 charset,
                 styles,
             } => {
-                write!(f, "CONVERT(")?;
+                f.write_str("CONVERT(")?;
                 if let Some(data_type) = data_type {
                     if let Some(charset) = charset {
                         write!(f, "{expr}, {data_type} CHARACTER SET {charset}")
@@ -1484,7 +1484,7 @@ impl fmt::Display for Expr {
                 results,
                 else_result,
             } => {
-                write!(f, "CASE")?;
+                f.write_str("CASE")?;
                 if let Some(operand) = operand {
                     write!(f, " {operand}")?;
                 }
@@ -1505,7 +1505,7 @@ impl fmt::Display for Expr {
             ),
             Expr::Subquery(s) => write!(f, "({s})"),
             Expr::GroupingSets(sets) => {
-                write!(f, "GROUPING SETS (")?;
+                f.write_str("GROUPING SETS (")?;
                 let mut sep = "";
                 for set in sets {
                     write!(f, "{sep}")?;
@@ -1515,7 +1515,7 @@ impl fmt::Display for Expr {
                 write!(f, ")")
             }
             Expr::Cube(sets) => {
-                write!(f, "CUBE (")?;
+                f.write_str("CUBE (")?;
                 let mut sep = "";
                 for set in sets {
                     write!(f, "{sep}")?;
@@ -1529,7 +1529,7 @@ impl fmt::Display for Expr {
                 write!(f, ")")
             }
             Expr::Rollup(sets) => {
-                write!(f, "ROLLUP (")?;
+                f.write_str("ROLLUP (")?;
                 let mut sep = "";
                 for set in sets {
                     write!(f, "{sep}")?;
@@ -1590,7 +1590,7 @@ impl fmt::Display for Expr {
                 trim_what,
                 trim_characters,
             } => {
-                write!(f, "TRIM(")?;
+                f.write_str("TRIM(")?;
                 if let Some(ident) = trim_where {
                     write!(f, "{ident} ")?;
                 }
@@ -2110,22 +2110,22 @@ impl fmt::Display for Declare {
         write!(f, "{}", display_comma_separated(names))?;
 
         if let Some(true) = binary {
-            write!(f, " BINARY")?;
+            f.write_str(" BINARY")?;
         }
 
         if let Some(sensitive) = sensitive {
             if *sensitive {
-                write!(f, " INSENSITIVE")?;
+                f.write_str(" INSENSITIVE")?;
             } else {
-                write!(f, " ASENSITIVE")?;
+                f.write_str(" ASENSITIVE")?;
             }
         }
 
         if let Some(scroll) = scroll {
             if *scroll {
-                write!(f, " SCROLL")?;
+                f.write_str(" SCROLL")?;
             } else {
-                write!(f, " NO SCROLL")?;
+                f.write_str(" NO SCROLL")?;
             }
         }
 
@@ -2135,9 +2135,9 @@ impl fmt::Display for Declare {
 
         if let Some(hold) = hold {
             if *hold {
-                write!(f, " WITH HOLD")?;
+                f.write_str(" WITH HOLD")?;
             } else {
-                write!(f, " WITHOUT HOLD")?;
+                f.write_str(" WITHOUT HOLD")?;
             }
         }
 
@@ -2247,6 +2247,7 @@ pub enum Statement {
         noscan: bool,
         compute_statistics: bool,
     },
+    /// ```sql
     /// ```sql
     /// TRUNCATE
     /// ```
@@ -3253,7 +3254,7 @@ impl fmt::Display for Statement {
                 export,
                 tables,
             } => {
-                write!(f, "FLUSH")?;
+                f.write_str("FLUSH")?;
                 if let Some(location) = location {
                     write!(f, " {location}")?;
                 }
@@ -3276,7 +3277,7 @@ impl fmt::Display for Statement {
                 )
             }
             Statement::Kill { modifier, id } => {
-                write!(f, "KILL ")?;
+                f.write_str("KILL ")?;
 
                 if let Some(m) = modifier {
                     write!(f, "{m} ")?;
@@ -3296,7 +3297,7 @@ impl fmt::Display for Statement {
                     write!(f, "{} ", format)?;
                 }
                 if *has_table_keyword {
-                    write!(f, "TABLE ")?;
+                    f.write_str("TABLE ")?;
                 }
 
                 write!(f, "{table_name}")
@@ -3311,11 +3312,11 @@ impl fmt::Display for Statement {
                 write!(f, "{describe_alias} ")?;
 
                 if *analyze {
-                    write!(f, "ANALYZE ")?;
+                    f.write_str("ANALYZE ")?;
                 }
 
                 if *verbose {
-                    write!(f, "VERBOSE ")?;
+                    f.write_str("VERBOSE ")?;
                 }
 
                 if let Some(format) = format {
@@ -3326,7 +3327,7 @@ impl fmt::Display for Statement {
             }
             Statement::Query(s) => write!(f, "{s}"),
             Statement::Declare { stmts } => {
-                write!(f, "DECLARE ")?;
+                f.write_str("DECLARE ")?;
                 write!(f, "{}", display_separated(stmts, "; "))
             }
             Statement::Fetch {
@@ -3398,14 +3399,14 @@ impl fmt::Display for Statement {
 
                 if let Some(identity) = identity {
                     match identity {
-                        TruncateIdentityOption::Restart => write!(f, " RESTART IDENTITY")?,
-                        TruncateIdentityOption::Continue => write!(f, " CONTINUE IDENTITY")?,
+                        TruncateIdentityOption::Restart => f.write_str(" RESTART IDENTITY")?,
+                        TruncateIdentityOption::Continue => f.write_str(" CONTINUE IDENTITY")?,
                     }
                 }
                 if let Some(cascade) = cascade {
                     match cascade {
-                        TruncateCascadeOption::Cascade => write!(f, " CASCADE")?,
-                        TruncateCascadeOption::Restrict => write!(f, " RESTRICT")?,
+                        TruncateCascadeOption::Cascade => f.write_str(" CASCADE")?,
+                        TruncateCascadeOption::Restrict => f.write_str(" RESTRICT")?,
                     }
                 }
 
@@ -3475,16 +3476,16 @@ impl fmt::Display for Statement {
                 }
 
                 if *compute_statistics {
-                    write!(f, " COMPUTE STATISTICS")?;
+                    f.write_str(" COMPUTE STATISTICS")?;
                 }
                 if *noscan {
-                    write!(f, " NOSCAN")?;
+                    f.write_str(" NOSCAN")?;
                 }
                 if *cache_metadata {
-                    write!(f, " CACHE METADATA")?;
+                    f.write_str(" CACHE METADATA")?;
                 }
                 if *for_columns {
-                    write!(f, " FOR COLUMNS")?;
+                    f.write_str(" FOR COLUMNS")?;
                     if !columns.is_empty() {
                         write!(f, " {}", display_comma_separated(columns))?;
                     }
@@ -3555,7 +3556,7 @@ impl fmt::Display for Statement {
                 }
 
                 if source.is_none() && columns.is_empty() {
-                    write!(f, "DEFAULT VALUES")?;
+                    f.write_str("DEFAULT VALUES")?;
                 }
 
                 if let Some(insert_alias) = insert_alias {
@@ -3596,7 +3597,7 @@ impl fmt::Display for Statement {
                 legacy_options,
                 values,
             } => {
-                write!(f, "COPY")?;
+                f.write_str("COPY")?;
                 match source {
                     CopySource::Query(query) => write!(f, " ({query})")?,
                     CopySource::Table {
@@ -3625,10 +3626,10 @@ impl fmt::Display for Statement {
                         if let Some(v) = v {
                             write!(f, "{v}")?;
                         } else {
-                            write!(f, "\\N")?;
+                            f.write_str("\\N")?;
                         }
                     }
-                    write!(f, "\n\\.")?;
+                    f.write_str("\n\\.")?;
                 }
                 Ok(())
             }
@@ -3664,7 +3665,7 @@ impl fmt::Display for Statement {
                     order_by,
                     limit,
                 } = delete;
-                write!(f, "DELETE ")?;
+                f.write_str("DELETE ")?;
                 if !tables.is_empty() {
                     write!(f, "{} ", display_comma_separated(tables))?;
                 }
@@ -3704,9 +3705,9 @@ impl fmt::Display for Statement {
                 location,
                 managed_location,
             } => {
-                write!(f, "CREATE DATABASE")?;
+                f.write_str("CREATE DATABASE")?;
                 if *if_not_exists {
-                    write!(f, " IF NOT EXISTS")?;
+                    f.write_str(" IF NOT EXISTS")?;
                 }
                 write!(f, " {db_name}")?;
                 if let Some(l) = location {
@@ -3841,9 +3842,9 @@ impl fmt::Display for Statement {
                 table_name,
                 option,
             } => {
-                write!(f, "DROP TRIGGER")?;
+                f.write_str("DROP TRIGGER")?;
                 if *if_exists {
-                    write!(f, " IF EXISTS")?;
+                    f.write_str(" IF EXISTS")?;
                 }
                 write!(f, " {trigger_name} ON {table_name}")?;
                 if let Some(option) = option {
@@ -3945,7 +3946,7 @@ impl fmt::Display for Statement {
                 }
                 write!(f, " AS {query}")?;
                 if *with_no_schema_binding {
-                    write!(f, " WITH NO SCHEMA BINDING")?;
+                    f.write_str(" WITH NO SCHEMA BINDING")?;
                 }
                 Ok(())
             }
@@ -3982,7 +3983,7 @@ impl fmt::Display for Statement {
                     if_not_exists = if *if_not_exists { "IF NOT EXISTS " } else { "" }
                 )?;
                 if *cascade || schema.is_some() || version.is_some() {
-                    write!(f, " WITH")?;
+                    f.write_str(" WITH")?;
 
                     if let Some(name) = schema {
                         write!(f, " SCHEMA {name}")?;
@@ -3991,7 +3992,7 @@ impl fmt::Display for Statement {
                         write!(f, " VERSION {version}")?;
                     }
                     if *cascade {
-                        write!(f, " CASCADE")?;
+                        f.write_str(" CASCADE")?;
                     }
                 }
 
@@ -4121,7 +4122,7 @@ impl fmt::Display for Statement {
                 if !options.is_empty() {
                     write!(f, ", {o}", o = display_comma_separated(options))?;
                 }
-                write!(f, " )")?;
+                f.write_str(" )")?;
                 Ok(())
             }
             Statement::AlterTable {
@@ -4132,12 +4133,12 @@ impl fmt::Display for Statement {
                 location,
                 on_cluster,
             } => {
-                write!(f, "ALTER TABLE ")?;
+                f.write_str("ALTER TABLE ")?;
                 if *if_exists {
-                    write!(f, "IF EXISTS ")?;
+                    f.write_str("IF EXISTS ")?;
                 }
                 if *only {
-                    write!(f, "ONLY ")?;
+                    f.write_str("ONLY ")?;
                 }
                 write!(f, "{name} ", name = name)?;
                 if let Some(cluster) = on_cluster {
@@ -4231,7 +4232,7 @@ impl fmt::Display for Statement {
                 name,
                 storage_specifier,
             } => {
-                write!(f, "DROP ")?;
+                f.write_str("DROP ")?;
                 if let Some(t) = temporary {
                     write!(f, "{}", if *t { "TEMPORARY " } else { "PERSISTENT " })?;
                 }
@@ -4304,7 +4305,7 @@ impl fmt::Display for Statement {
                 Ok(())
             }
             Statement::ShowVariable { variable } => {
-                write!(f, "SHOW")?;
+                f.write_str("SHOW")?;
                 if !variable.is_empty() {
                     write!(f, " {}", display_separated(variable, " "))?;
                 }
@@ -4315,14 +4316,14 @@ impl fmt::Display for Statement {
                 global,
                 session,
             } => {
-                write!(f, "SHOW")?;
+                f.write_str("SHOW")?;
                 if *global {
-                    write!(f, " GLOBAL")?;
+                    f.write_str(" GLOBAL")?;
                 }
                 if *session {
-                    write!(f, " SESSION")?;
+                    f.write_str(" SESSION")?;
                 }
-                write!(f, " STATUS")?;
+                f.write_str(" STATUS")?;
                 if filter.is_some() {
                     write!(f, " {}", filter.as_ref().unwrap())?;
                 }
@@ -4333,14 +4334,14 @@ impl fmt::Display for Statement {
                 global,
                 session,
             } => {
-                write!(f, "SHOW")?;
+                f.write_str("SHOW")?;
                 if *global {
-                    write!(f, " GLOBAL")?;
+                    f.write_str(" GLOBAL")?;
                 }
                 if *session {
-                    write!(f, " SESSION")?;
+                    f.write_str(" SESSION")?;
                 }
-                write!(f, " VARIABLES")?;
+                f.write_str(" VARIABLES")?;
                 if filter.is_some() {
                     write!(f, " {}", filter.as_ref().unwrap())?;
                 }
@@ -4389,7 +4390,7 @@ impl fmt::Display for Statement {
                 Ok(())
             }
             Statement::ShowFunctions { filter } => {
-                write!(f, "SHOW FUNCTIONS")?;
+                f.write_str("SHOW FUNCTIONS")?;
                 if let Some(filter) = filter {
                     write!(f, " {filter}")?;
                 }
@@ -4397,7 +4398,7 @@ impl fmt::Display for Statement {
             }
             Statement::Use(use_expr) => use_expr.fmt(f),
             Statement::ShowCollation { filter } => {
-                write!(f, "SHOW COLLATION")?;
+                f.write_str("SHOW COLLATION")?;
                 if let Some(filter) = filter {
                     write!(f, " {filter}")?;
                 }
@@ -4412,10 +4413,10 @@ impl fmt::Display for Statement {
                     if let Some(modifier) = *modifier {
                         write!(f, "BEGIN {} TRANSACTION", modifier)?;
                     } else {
-                        write!(f, "BEGIN TRANSACTION")?;
+                        f.write_str("BEGIN TRANSACTION")?;
                     }
                 } else {
-                    write!(f, "START TRANSACTION")?;
+                    f.write_str("START TRANSACTION")?;
                 }
                 if !modes.is_empty() {
                     write!(f, " {}", display_comma_separated(modes))?;
@@ -4428,9 +4429,9 @@ impl fmt::Display for Statement {
                 session,
             } => {
                 if *session {
-                    write!(f, "SET SESSION CHARACTERISTICS AS TRANSACTION")?;
+                    f.write_str("SET SESSION CHARACTERISTICS AS TRANSACTION")?;
                 } else {
-                    write!(f, "SET TRANSACTION")?;
+                    f.write_str("SET TRANSACTION")?;
                 }
                 if !modes.is_empty() {
                     write!(f, " {}", display_comma_separated(modes))?;
@@ -4444,10 +4445,10 @@ impl fmt::Display for Statement {
                 write!(f, "COMMIT{}", if *chain { " AND CHAIN" } else { "" },)
             }
             Statement::Rollback { chain, savepoint } => {
-                write!(f, "ROLLBACK")?;
+                f.write_str("ROLLBACK")?;
 
                 if *chain {
-                    write!(f, " AND CHAIN")?;
+                    f.write_str(" AND CHAIN")?;
                 }
 
                 if let Some(savepoint) = savepoint {
@@ -4483,7 +4484,7 @@ impl fmt::Display for Statement {
                 write!(f, "ON {objects} ")?;
                 write!(f, "TO {}", display_comma_separated(grantees))?;
                 if *with_grant_option {
-                    write!(f, " WITH GRANT OPTION")?;
+                    f.write_str(" WITH GRANT OPTION")?;
                 }
                 if let Some(grantor) = granted_by {
                     write!(f, " GRANTED BY {grantor}")?;
@@ -4543,9 +4544,9 @@ impl fmt::Display for Statement {
                 comment,
                 if_exists,
             } => {
-                write!(f, "COMMENT ")?;
+                f.write_str("COMMENT ")?;
                 if *if_exists {
-                    write!(f, "IF EXISTS ")?
+                    f.write_str("IF EXISTS ")?
                 };
                 write!(f, "ON {object_type} {object_name} IS ")?;
                 if let Some(c) = comment {
@@ -4555,7 +4556,7 @@ impl fmt::Display for Statement {
                 }
             }
             Statement::Savepoint { name } => {
-                write!(f, "SAVEPOINT ")?;
+                f.write_str("SAVEPOINT ")?;
                 write!(f, "{name}")
             }
             Statement::ReleaseSavepoint { name } => {
@@ -4705,7 +4706,7 @@ impl fmt::Display for Statement {
                     if from_stage_alias.as_ref().is_some() {
                         write!(f, " AS {}", from_stage_alias.as_ref().unwrap())?;
                     }
-                    write!(f, ")")?;
+                    f.write_str(")")?;
                 }
                 if files.is_some() {
                     write!(
@@ -4780,7 +4781,7 @@ impl fmt::Display for Statement {
                     write!(f, " {partition}", partition = partition)?;
                 }
                 if *include_final {
-                    write!(f, " FINAL")?;
+                    f.write_str(" FINAL")?;
                 }
                 if let Some(deduplicate) = deduplicate {
                     write!(f, " {deduplicate}")?;
@@ -5002,7 +5003,7 @@ impl fmt::Display for OnInsert {
 }
 impl fmt::Display for OnConflict {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, " ON CONFLICT")?;
+        f.write_str(" ON CONFLICT")?;
         if let Some(target) = &self.conflict_target {
             write!(f, "{target}")?;
         }
@@ -5022,7 +5023,7 @@ impl fmt::Display for OnConflictAction {
         match self {
             Self::DoNothing => write!(f, "DO NOTHING"),
             Self::DoUpdate(do_update) => {
-                write!(f, "DO UPDATE")?;
+                f.write_str("DO UPDATE")?;
                 if !do_update.assignments.is_empty() {
                     write!(
                         f,
@@ -5676,18 +5677,18 @@ pub enum ListAggOnOverflow {
 
 impl fmt::Display for ListAggOnOverflow {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "ON OVERFLOW")?;
+        f.write_str("ON OVERFLOW")?;
         match self {
             ListAggOnOverflow::Error => write!(f, " ERROR"),
             ListAggOnOverflow::Truncate { filler, with_count } => {
-                write!(f, " TRUNCATE")?;
+                f.write_str(" TRUNCATE")?;
                 if let Some(filler) = filler {
                     write!(f, " {filler}")?;
                 }
                 if *with_count {
-                    write!(f, " WITH")?;
+                    f.write_str(" WITH")?;
                 } else {
-                    write!(f, " WITHOUT")?;
+                    f.write_str(" WITHOUT")?;
                 }
                 write!(f, " COUNT")
             }
@@ -7018,7 +7019,7 @@ pub enum CreateFunctionUsing {
 
 impl fmt::Display for CreateFunctionUsing {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "USING ")?;
+        f.write_str("USING ")?;
         match self {
             CreateFunctionUsing::Jar(uri) => write!(f, "JAR '{uri}'"),
             CreateFunctionUsing::File(uri) => write!(f, "FILE '{uri}'"),
@@ -7141,16 +7142,16 @@ impl fmt::Display for SearchModifier {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::InNaturalLanguageMode => {
-                write!(f, "IN NATURAL LANGUAGE MODE")?;
+                f.write_str("IN NATURAL LANGUAGE MODE")?;
             }
             Self::InNaturalLanguageModeWithQueryExpansion => {
-                write!(f, "IN NATURAL LANGUAGE MODE WITH QUERY EXPANSION")?;
+                f.write_str("IN NATURAL LANGUAGE MODE WITH QUERY EXPANSION")?;
             }
             Self::InBooleanMode => {
-                write!(f, "IN BOOLEAN MODE")?;
+                f.write_str("IN BOOLEAN MODE")?;
             }
             Self::WithQueryExpansion => {
-                write!(f, "WITH QUERY EXPANSION")?;
+                f.write_str("WITH QUERY EXPANSION")?;
             }
         }
 
@@ -7202,16 +7203,16 @@ impl fmt::Display for LockTableType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Read { local } => {
-                write!(f, "READ")?;
+                f.write_str("READ")?;
                 if *local {
-                    write!(f, " LOCAL")?;
+                    f.write_str(" LOCAL")?;
                 }
             }
             Self::Write { low_priority } => {
                 if *low_priority {
-                    write!(f, "LOW_PRIORITY ")?;
+                    f.write_str("LOW_PRIORITY ")?;
                 }
-                write!(f, "WRITE")?;
+                f.write_str("WRITE")?;
             }
         }
 
@@ -7233,7 +7234,7 @@ pub struct HiveSetLocation {
 impl fmt::Display for HiveSetLocation {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if self.has_set {
-            write!(f, "SET ")?;
+            f.write_str("SET ")?;
         }
         write!(f, "LOCATION {}", self.location)
     }
@@ -7255,7 +7256,7 @@ pub enum MySQLColumnPosition {
 impl Display for MySQLColumnPosition {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            MySQLColumnPosition::First => Ok(write!(f, "FIRST")?),
+            MySQLColumnPosition::First => Ok(f.write_str("FIRST")?),
             MySQLColumnPosition::After(ident) => {
                 let column_name = &ident.value;
                 Ok(write!(f, "AFTER {column_name}")?)

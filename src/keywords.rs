@@ -45,10 +45,11 @@ macro_rules! define_keywords {
     ($(
         $ident:ident $(= $string_keyword:expr)?
     ),*) => {
-        #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Hash)]
+        #[derive(Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Hash)]
         #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
         #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
         #[allow(non_camel_case_types)]
+        #[repr(u32)]
         pub enum Keyword {
             NoKeyword,
             $($ident),*
@@ -63,6 +64,18 @@ macro_rules! define_keywords {
             $($ident),*
         ];
     };
+}
+
+impl std::fmt::Debug for Keyword {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let index = *self as usize;
+        let text = if index == 0 {
+            "NoKeyword"
+        } else {
+            &ALL_KEYWORDS[index - 1]
+        };
+        write!(f, "{}", text)
+    }
 }
 
 // The following keywords should be sorted to be able to match using binary search
