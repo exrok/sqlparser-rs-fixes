@@ -101,9 +101,13 @@ where
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut delim = "";
         for t in self.slice {
-            write!(f, "{delim}")?;
+            if let Err(err) = f.write_str(delim) {
+                return Err(err);
+            }
             delim = self.sep;
-            write!(f, "{t}")?;
+            if let Err(err) = t.fmt(f) {
+                return Err(err);
+            }
         }
         Ok(())
     }

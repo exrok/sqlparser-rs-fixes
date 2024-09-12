@@ -288,8 +288,17 @@ pub struct Parser<'a> {
     /// Ensure the stack does not overflow by limiting recursion depth.
     recursion_counter: RecursionCounter,
 }
-
+fn expectedx(expected: &str, found: TokenWithLocation) -> ParserError {
+    ParserError::ParserError(format!(
+        "Expected: {expected}, found: {found}{}",
+        found.location
+    ))
+}
 impl<'a> Parser<'a> {
+    #[inline]
+    pub fn expected<T>(&self, expected: &str, found: TokenWithLocation) -> Result<T, ParserError> {
+        Err(expectedx(expected, found))
+    }
     /// Create a parser for a [`Dialect`]
     ///
     /// See also [`Parser::parse_sql`]
@@ -3252,12 +3261,6 @@ impl<'a> Parser<'a> {
     }
 
     /// Report `found` was encountered instead of `expected`
-    pub fn expected<T>(&self, expected: &str, found: TokenWithLocation) -> Result<T, ParserError> {
-        parser_err!(
-            format!("Expected: {expected}, found: {found}"),
-            found.location
-        )
-    }
 
     /// If the current token is the `expected` keyword, consume it and returns
     /// true. Otherwise, no tokens are consumed and returns false.
