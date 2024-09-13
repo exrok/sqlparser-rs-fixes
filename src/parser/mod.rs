@@ -3817,7 +3817,7 @@ impl<'a> Parser<'a> {
     }
 
     /// Parse 'AS' before as query,such as `WITH XXX AS SELECT XXX` oer `CACHE TABLE AS SELECT XXX`
-    pub fn parse_as_query(&mut self) -> Result<(bool, Query), ParserError> {
+    pub fn parse_as_query(&mut self) -> Result<(bool, Box<Query>), ParserError> {
         match self.peek_token().token {
             Token::Word(word) => match word.keyword {
                 Keyword::AS => {
@@ -6439,7 +6439,7 @@ impl<'a> Parser<'a> {
                 } else if self.parse_keyword(Keyword::IMMEDIATE) {
                     cc.initially = Some(DeferrableInitial::Immediate);
                 } else {
-                    self.expected("one of DEFERRED or IMMEDIATE", stry!(self.peek_token()));
+                    stry!(self.expected("one of DEFERRED or IMMEDIATE", self.peek_token()));
                 }
             } else if cc.enforced.is_none() && self.parse_keyword(Keyword::ENFORCED) {
                 cc.enforced = Some(true);
@@ -8799,14 +8799,14 @@ impl<'a> Parser<'a> {
     /// builds. Instead of `sizeof(Query)` only a pointer (`Box<Query>`)
     /// is used.
     pub fn parse_boxed_query(&mut self) -> Result<Box<Query>, ParserError> {
-        self.parse_query().map(Box::new)
+        self.parse_query()
     }
 
     /// Parse a query expression, i.e. a `SELECT` statement optionally
     /// preceded with some `WITH` CTE declarations and optionally followed
     /// by `ORDER BY`. Unlike some other parse_... methods, this one doesn't
     /// expect the initial keyword to be already consumed
-    pub fn parse_query(&mut self) -> Result<Query, ParserError> {
+    pub fn parse_query(&mut self) -> Result<Box<Query>, ParserError> {
         let _guard = stry!(self.recursion_counter.try_decrease());
         let with = if self.parse_keyword(Keyword::WITH) {
             Some(With {
@@ -8816,34 +8816,10 @@ impl<'a> Parser<'a> {
         } else {
             None
         };
-        if self.parse_keyword(Keyword::INSERT) {
-            Ok(Query {
-                with,
-                body: stry!(self.parse_insert_setexpr_boxed()),
-                limit: None,
-                limit_by: vec![],
-                order_by: None,
-                offset: None,
-                fetch: None,
-                locks: vec![],
-                for_clause: None,
-                settings: None,
-                format_clause: None,
-            })
+        let body = if self.parse_keyword(Keyword::INSERT) {
+            stry!(self.parse_insert_setexpr_boxed())
         } else if self.parse_keyword(Keyword::UPDATE) {
-            Ok(Query {
-                with,
-                body: stry!(self.parse_update_setexpr_boxed()),
-                limit: None,
-                limit_by: vec![],
-                order_by: None,
-                offset: None,
-                fetch: None,
-                locks: vec![],
-                for_clause: None,
-                settings: None,
-                format_clause: None,
-            })
+            stry!(self.parse_update_setexpr_boxed())
         } else {
             let body = stry!(self.parse_boxed_query_body(self.dialect.prec_unknown()));
 
@@ -8915,7 +8891,7 @@ impl<'a> Parser<'a> {
                 None
             };
 
-            Ok(Query {
+            return Ok(Box::new(Query {
                 with,
                 body,
                 order_by,
@@ -8927,8 +8903,21 @@ impl<'a> Parser<'a> {
                 for_clause,
                 settings,
                 format_clause,
-            })
-        }
+            }));
+        };
+        Ok(Box::new(Query {
+            with,
+            body,
+            limit: None,
+            limit_by: Vec::new(),
+            order_by: None,
+            offset: None,
+            fetch: None,
+            locks: Vec::new(),
+            for_clause: None,
+            settings: None,
+            format_clause: None,
+        }))
     }
 
     fn parse_settings(&mut self) -> Result<Option<Vec<Setting>>, ParserError> {
@@ -9594,7 +9583,7 @@ impl<'a> Parser<'a> {
                     local: modifier == Some(Keyword::LOCAL),
                     value: expr,
                 }),
-                _ => self.expected("timezone value", stry!(self.peek_token())),
+                _ => stry!(self.expected("timezone value", self.peek_token())),
             }
         } else if variable.to_string() == "CHARACTERISTICS" {
             stry!(self.expect_keywords(&[Keyword::AS, Keyword::TRANSACTION]));
