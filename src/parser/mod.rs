@@ -930,7 +930,7 @@ impl<'a> Parser<'a> {
         let next_token = self.next_token();
         match next_token.token {
             t @ (Token::Word(_) | Token::SingleQuotedString(_)) => {
-                if matches!(self.peek_token().token, Token::Period) {
+                if self.is_next_token(std::mem::discriminant(&Token::Period)) {
                     let mut id_parts: Vec<Ident> = vec![match t {
                         Token::Word(w) => w.to_ident(),
                         Token::SingleQuotedString(s) => Ident::with_quote('\'', s),
@@ -1128,7 +1128,7 @@ impl<'a> Parser<'a> {
                 Keyword::EXTRACT => self.parse_extract_expr(),
                 Keyword::CEIL => self.parse_ceil_floor_expr(true),
                 Keyword::FLOOR => self.parse_ceil_floor_expr(false),
-                Keyword::POSITION if matches!(self.peek_token().token, Token::LParen) => {
+                Keyword::POSITION if self.is_next_token(std::mem::discriminant(&Token::LParen)) => {
                     self.parse_position_expr(w.to_ident())
                 }
                 Keyword::SUBSTRING => self.parse_substring_expr(),
@@ -1136,12 +1136,12 @@ impl<'a> Parser<'a> {
                 Keyword::TRIM => self.parse_trim_expr(),
                 Keyword::INTERVAL => self.parse_interval(),
                 // Treat ARRAY[1,2,3] as an array [1,2,3], otherwise try as subquery or a function call
-                Keyword::ARRAY if matches!(self.peek_token().token, Token::LBracket) => {
+                Keyword::ARRAY if self.is_next_token(std::mem::discriminant(&Token::LBracket)) => {
                     stry!(self.expect_token(&Token::LBracket));
                     self.parse_array_expr(true)
                 }
                 Keyword::ARRAY
-                    if matches!(self.peek_token().token, Token::LParen)
+                    if self.is_next_token(std::mem::discriminant(&Token::LParen))
                         && !dialect_of!(self is ClickHouseDialect | DatabricksDialect) =>
                 {
                     stry!(self.expect_token(&Token::LParen));
@@ -1169,7 +1169,7 @@ impl<'a> Parser<'a> {
                     let expr = stry!(self.parse_subexpr(self.dialect.prec_value(Precedence::PlusMinus)));
                     Ok(Expr::Prior(Box::new(expr)))
                 }
-                Keyword::MAP if matches!(self.peek_token().token, Token::LBrace) && self.dialect.support_map_literal_syntax() => {
+                Keyword::MAP if self.is_next_token(std::mem::discriminant(&Token::LBrace)) && self.dialect.support_map_literal_syntax() => {
                     self.parse_duckdb_map_literal()
                 }
                 // Here `w` is a word, check if it's a part of a multipart
@@ -2345,7 +2345,7 @@ impl<'a> Parser<'a> {
         stry!(self.expect_keyword(Keyword::STRUCT));
 
         // Nothing to do if we have no type information.
-        if !matches!(self.peek_token().token, Token::Lt) {
+        if !self.is_next_token(std::mem::discriminant(&Token::Lt)) {
             return Ok((Default::default(), false.into()));
         }
         self.next_token();
@@ -3137,6 +3137,23 @@ impl<'a> Parser<'a> {
         self.dialect.get_next_precedence_default(self)
     }
 
+    fn is_next_token(&self, kind: std::mem::Discriminant<Token>) -> bool {
+        let Some(remaining) = self.tokens.get(self.index..) else {
+            return false;
+        };
+        for token in remaining {
+            if matches!(token.token, Token::Whitespace(..)) {
+                continue;
+            }
+            if std::mem::discriminant(&token.token) == kind {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+
     /// Return the first non-whitespace token that has not yet been processed
     /// (or None if reached end-of-file)
     pub fn peek_token(&self) -> TokenWithLocation {
@@ -3244,11 +3261,8 @@ impl<'a> Parser<'a> {
                     token: Token::Whitespace(_),
                     location: _,
                 }) => continue,
-                token => {
-                    return token
-                        .cloned()
-                        .unwrap_or_else(|| TokenWithLocation::wrap(Token::EOF))
-                }
+                Some(token) => return token.clone(),
+                None => return TokenWithLocation::wrap(Token::EOF),
             }
         }
     }
@@ -3693,7 +3707,7 @@ impl<'a> Parser<'a> {
 
         let mut storage_specifier = None;
         let mut name = None;
-        if self.peek_token() != Token::LParen {
+        if self.peek_token().token != Token::LParen {
             if self.parse_keyword(Keyword::IN) {
                 storage_specifier = self.parse_identifier(false).ok()
             } else {
@@ -3702,7 +3716,7 @@ impl<'a> Parser<'a> {
 
             // Storage specifier may follow the name
             if storage_specifier.is_none()
-                && self.peek_token() != Token::LParen
+                && self.peek_token().token != Token::LParen
                 && self.parse_keyword(Keyword::IN)
             {
                 storage_specifier = self.parse_identifier(false).ok();
@@ -3784,14 +3798,14 @@ impl<'a> Parser<'a> {
             table_flag = Some(stry!(self.parse_object_name(false)));
             if self.parse_keyword(Keyword::TABLE) {
                 let table_name = stry!(self.parse_object_name(false));
-                if self.peek_token() != Token::EOF {
+                if self.peek_token().token != Token::EOF {
                     if let Token::Word(word) = self.peek_token().token {
                         if word.keyword == Keyword::OPTIONS {
                             options = stry!(self.parse_options(Keyword::OPTIONS))
                         }
                     };
 
-                    if self.peek_token() != Token::EOF {
+                    if self.peek_token().token != Token::EOF {
                         let (a, q) = stry!(self.parse_as_query());
                         has_as = a;
                         query = Some(q);
@@ -3814,7 +3828,7 @@ impl<'a> Parser<'a> {
                     })
                 }
             } else {
-                if matches!(self.peek_token().token, Token::EOF) {
+                if self.is_next_token(std::mem::discriminant(&Token::EOF)) {
                     self.prev_token();
                 }
                 expected_error!("a `TABLE` keyword", self.peek_token())
@@ -5219,58 +5233,59 @@ impl<'a> Parser<'a> {
         let mut stmts = vec![];
         loop {
             let name = stry!(self.parse_identifier(false));
-            let (declare_type, for_query, assigned_expr, data_type) =
-                if self.parse_keyword(Keyword::CURSOR) {
-                    stry!(self.expect_keyword(Keyword::FOR));
-                    match self.peek_token().token {
-                        Token::Word(w) if w.keyword == Keyword::SELECT => (
-                            Some(DeclareType::Cursor),
-                            Some(stry!(self.parse_boxed_query())),
-                            None,
-                            None,
-                        ),
-                        _ => (
-                            Some(DeclareType::Cursor),
-                            None,
-                            Some(DeclareAssignment::For(Box::new(stry!(self.parse_expr())))),
-                            None,
-                        ),
-                    }
-                } else if self.parse_keyword(Keyword::RESULTSET) {
-                    let assigned_expr = if self.peek_token().token != Token::SemiColon {
-                        stry!(self.parse_snowflake_variable_declaration_expression())
-                    } else {
-                        // Nothing more to do. The statement has no further parameters.
-                        None
-                    };
-
-                    (Some(DeclareType::ResultSet), None, assigned_expr, None)
-                } else if self.parse_keyword(Keyword::EXCEPTION) {
-                    let assigned_expr = if matches!(self.peek_token().token, Token::LParen) {
-                        Some(DeclareAssignment::Expr(Box::new(stry!(self.parse_expr()))))
-                    } else {
-                        // Nothing more to do. The statement has no further parameters.
-                        None
-                    };
-
-                    (Some(DeclareType::Exception), None, assigned_expr, None)
+            let (declare_type, for_query, assigned_expr, data_type) = if self
+                .parse_keyword(Keyword::CURSOR)
+            {
+                stry!(self.expect_keyword(Keyword::FOR));
+                match self.peek_token().token {
+                    Token::Word(w) if w.keyword == Keyword::SELECT => (
+                        Some(DeclareType::Cursor),
+                        Some(stry!(self.parse_boxed_query())),
+                        None,
+                        None,
+                    ),
+                    _ => (
+                        Some(DeclareType::Cursor),
+                        None,
+                        Some(DeclareAssignment::For(Box::new(stry!(self.parse_expr())))),
+                        None,
+                    ),
+                }
+            } else if self.parse_keyword(Keyword::RESULTSET) {
+                let assigned_expr = if self.peek_token().token != Token::SemiColon {
+                    stry!(self.parse_snowflake_variable_declaration_expression())
                 } else {
-                    // Without an explicit keyword, the only valid option is variable declaration.
-                    let (assigned_expr, data_type) = if let Some(assigned_expr) =
-                        stry!(self.parse_snowflake_variable_declaration_expression())
-                    {
-                        (Some(assigned_expr), None)
-                    } else if let Token::Word(_) = self.peek_token().token {
-                        let data_type = stry!(self.parse_data_type());
-                        (
-                            stry!(self.parse_snowflake_variable_declaration_expression()),
-                            Some(data_type),
-                        )
-                    } else {
-                        (None, None)
-                    };
-                    (None, None, assigned_expr, data_type)
+                    // Nothing more to do. The statement has no further parameters.
+                    None
                 };
+
+                (Some(DeclareType::ResultSet), None, assigned_expr, None)
+            } else if self.parse_keyword(Keyword::EXCEPTION) {
+                let assigned_expr = if self.is_next_token(std::mem::discriminant(&Token::LParen)) {
+                    Some(DeclareAssignment::Expr(Box::new(stry!(self.parse_expr()))))
+                } else {
+                    // Nothing more to do. The statement has no further parameters.
+                    None
+                };
+
+                (Some(DeclareType::Exception), None, assigned_expr, None)
+            } else {
+                // Without an explicit keyword, the only valid option is variable declaration.
+                let (assigned_expr, data_type) = if let Some(assigned_expr) =
+                    stry!(self.parse_snowflake_variable_declaration_expression())
+                {
+                    (Some(assigned_expr), None)
+                } else if let Token::Word(_) = self.peek_token().token {
+                    let data_type = stry!(self.parse_data_type());
+                    (
+                        stry!(self.parse_snowflake_variable_declaration_expression()),
+                        Some(data_type),
+                    )
+                } else {
+                    (None, None)
+                };
+                (None, None, assigned_expr, data_type)
+            };
             let stmt = Declare {
                 names: vec![name],
                 data_type,
@@ -5367,7 +5382,7 @@ impl<'a> Parser<'a> {
                 for_query: None,
             });
 
-            if self.next_token() != Token::Comma {
+            if self.next_token().token != Token::Comma {
                 break;
             }
         }
@@ -5849,7 +5864,7 @@ impl<'a> Parser<'a> {
             match next_token.token {
                 Token::Word(w) => {
                     let name = w.value;
-                    let parameters = if matches!(self.peek_token().token, Token::LParen) {
+                    let parameters = if self.is_next_token(std::mem::discriminant(&Token::LParen)) {
                         Some(stry!(self.parse_parenthesized_identifiers()))
                     } else {
                         None
@@ -5885,7 +5900,7 @@ impl<'a> Parser<'a> {
 
         let order_by = if self.parse_keywords(&[Keyword::ORDER, Keyword::BY]) {
             if self.consume_token(&Token::LParen) {
-                let columns = if self.peek_token() != Token::RParen {
+                let columns = if self.peek_token().token != Token::RParen {
                     self.parse_comma_separated(|p| p.parse_expr())?
                 } else {
                     vec![]
@@ -6072,7 +6087,7 @@ impl<'a> Parser<'a> {
             }
 
             let comma = self.consume_token(&Token::Comma);
-            let rparen = matches!(self.peek_token().token, Token::RParen);
+            let rparen = self.is_next_token(std::mem::discriminant(&Token::RParen));
 
             if !comma && !rparen {
                 return expected_error!("',' or ')' after column definition", self.peek_token());
@@ -7123,7 +7138,7 @@ impl<'a> Parser<'a> {
 
                 let mut sequence_options: Option<Vec<SequenceOptions>> = None;
 
-                if matches!(self.peek_token().token, Token::LParen) {
+                if self.is_next_token(std::mem::discriminant(&Token::LParen)) {
                     stry!(self.expect_token(&Token::LParen));
                     sequence_options = Some(stry!(self.parse_create_sequence_options()));
                     stry!(self.expect_token(&Token::RParen));
@@ -7333,7 +7348,7 @@ impl<'a> Parser<'a> {
     #[cfg(feature = "full-ast")]
     pub fn parse_call(&mut self) -> Result<Statement, ParserError> {
         let object_name = stry!(self.parse_object_name(false));
-        if matches!(self.peek_token().token, Token::LParen) {
+        if self.is_next_token(std::mem::discriminant(&Token::LParen)) {
             match stry!(self.parse_function(object_name)) {
                 Expr::Function(f) => Ok(Statement::Call(f)),
                 other => parser_err!(
@@ -8455,7 +8470,7 @@ impl<'a> Parser<'a> {
     #[cfg(feature = "full-ast")]
     fn parse_view_columns(&mut self) -> Result<Vec<ViewColumnDef>, ParserError> {
         if self.consume_token(&Token::LParen) {
-            if matches!(self.peek_token().token, Token::RParen) {
+            if self.is_next_token(std::mem::discriminant(&Token::RParen)) {
                 self.next_token();
                 Ok(vec![])
             } else {
@@ -8499,7 +8514,7 @@ impl<'a> Parser<'a> {
         allow_empty: bool,
     ) -> Result<Vec<Ident>, ParserError> {
         if self.consume_token(&Token::LParen) {
-            if allow_empty && matches!(self.peek_token().token, Token::RParen) {
+            if allow_empty && self.is_next_token(std::mem::discriminant(&Token::RParen)) {
                 self.next_token();
                 Ok(vec![])
             } else {
@@ -8963,7 +8978,7 @@ impl<'a> Parser<'a> {
     pub fn parse_for_xml(&mut self) -> Result<ForClause, ParserError> {
         let for_xml = if self.parse_keyword(Keyword::RAW) {
             let mut element_name = None;
-            if matches!(self.peek_token().token, Token::LParen) {
+            if self.is_next_token(std::mem::discriminant(&Token::LParen)) {
                 stry!(self.expect_token(&Token::LParen));
                 element_name = Some(stry!(self.parse_literal_string()));
                 stry!(self.expect_token(&Token::RParen));
@@ -8975,7 +8990,7 @@ impl<'a> Parser<'a> {
             ForXml::Explicit
         } else if self.parse_keyword(Keyword::PATH) {
             let mut element_name = None;
-            if matches!(self.peek_token().token, Token::LParen) {
+            if self.is_next_token(std::mem::discriminant(&Token::LParen)) {
                 stry!(self.expect_token(&Token::LParen));
                 element_name = Some(stry!(self.parse_literal_string()));
                 stry!(self.expect_token(&Token::RParen));
@@ -8990,7 +9005,7 @@ impl<'a> Parser<'a> {
         let mut binary_base64 = false;
         let mut root = None;
         let mut r#type = false;
-        while matches!(self.peek_token().token, Token::Comma) {
+        while self.is_next_token(std::mem::discriminant(&Token::Comma)) {
             self.next_token();
             if self.parse_keyword(Keyword::ELEMENTS) {
                 elements = true;
@@ -9028,7 +9043,7 @@ impl<'a> Parser<'a> {
         let mut root = None;
         let mut include_null_values = false;
         let mut without_array_wrapper = false;
-        while matches!(self.peek_token().token, Token::Comma) {
+        while self.is_next_token(std::mem::discriminant(&Token::Comma)) {
             self.next_token();
             if self.parse_keyword(Keyword::ROOT) {
                 stry!(self.expect_token(&Token::LParen));
@@ -10977,7 +10992,7 @@ impl<'a> Parser<'a> {
                             Some(ConflictTarget::OnConstraint(stry!(
                                 self.parse_object_name(false)
                             )))
-                        } else if matches!(self.peek_token().token, Token::LParen) {
+                        } else if self.is_next_token(std::mem::discriminant(&Token::LParen)) {
                             Some(ConflictTarget::Columns(stry!(self
                                 .parse_parenthesized_column_list(
                                     IsOptional::Mandatory,
@@ -11399,7 +11414,7 @@ impl<'a> Parser<'a> {
         &mut self,
     ) -> Result<Option<ExceptSelectItem>, ParserError> {
         let opt_except = if self.parse_keyword(Keyword::EXCEPT) {
-            if matches!(self.peek_token().token, Token::LParen) {
+            if self.is_next_token(std::mem::discriminant(&Token::LParen)) {
                 let mut idents = stry!(self.parse_parenthesized_column_list(Mandatory, false));
                 if idents.is_empty() {
                     return stry!(self.expected(
@@ -11923,8 +11938,8 @@ impl<'a> Parser<'a> {
     pub fn parse_merge_clauses(&mut self) -> Result<Vec<MergeClause>, ParserError> {
         let mut clauses = vec![];
         loop {
-            if matches!(self.peek_token().token, Token::EOF)
-                || matches!(self.peek_token().token, Token::SemiColon)
+            if self.is_next_token(std::mem::discriminant(&Token::EOF))
+                || self.is_next_token(std::mem::discriminant(&Token::SemiColon))
             {
                 break;
             }
@@ -12430,19 +12445,19 @@ mod tests {
     fn test_prev_index() {
         let sql = "SELECT version";
         all_dialects().run_parser_method(sql, |parser| {
-            assert_eq!(parser.peek_token(), Token::make_keyword("SELECT"));
-            assert_eq!(parser.next_token(), Token::make_keyword("SELECT"));
+            assert_eq!(parser.peek_token().token, Token::make_keyword("SELECT"));
+            assert_eq!(parser.next_token().token, Token::make_keyword("SELECT"));
             parser.prev_token();
-            assert_eq!(parser.next_token(), Token::make_keyword("SELECT"));
-            assert_eq!(parser.next_token(), Token::make_word("version", None));
+            assert_eq!(parser.next_token().token, Token::make_keyword("SELECT"));
+            assert_eq!(parser.next_token().token, Token::make_word("version", None));
             parser.prev_token();
-            assert_eq!(parser.peek_token(), Token::make_word("version", None));
-            assert_eq!(parser.next_token(), Token::make_word("version", None));
-            assert_eq!(parser.peek_token(), Token::EOF);
+            assert_eq!(parser.peek_token().token, Token::make_word("version", None));
+            assert_eq!(parser.next_token().token, Token::make_word("version", None));
+            assert_eq!(parser.peek_token().token, Token::EOF);
             parser.prev_token();
-            assert_eq!(parser.next_token(), Token::make_word("version", None));
-            assert_eq!(parser.next_token(), Token::EOF);
-            assert_eq!(parser.next_token(), Token::EOF);
+            assert_eq!(parser.next_token().token, Token::make_word("version", None));
+            assert_eq!(parser.next_token().token, Token::EOF);
+            assert_eq!(parser.next_token().token, Token::EOF);
             parser.prev_token();
         });
     }
