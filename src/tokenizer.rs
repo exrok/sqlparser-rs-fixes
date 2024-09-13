@@ -43,7 +43,11 @@ use crate::dialect::{
 use crate::keywords::{Keyword, ALL_KEYWORDS, ALL_KEYWORDS_INDEX};
 
 /// SQL Token enumeration
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+// #[derive(Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[derive(Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[cfg_attr(feature = "cmp-ast", derive(PartialOrd, Ord))]
+#[cfg_attr(feature = "hash-ast", derive(Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
 pub enum Token {
@@ -439,10 +443,17 @@ impl fmt::Display for Location {
 }
 
 /// A [Token] with [Location] attached to it
-#[derive(Debug, Eq, PartialEq, Clone)]
+// #[cfg_attr(feature = "debug-ast", derive(Debug))]
+#[derive(Clone)]
+#[cfg_attr(feature = "cmp-ast", derive(PartialEq, Eq))]
 pub struct TokenWithLocation {
     pub token: Token,
     pub location: Location,
+}
+impl std::fmt::Debug for TokenWithLocation {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} {:?}", self.token, self.location)
+    }
 }
 
 impl TokenWithLocation {
@@ -458,17 +469,17 @@ impl TokenWithLocation {
     }
 }
 
-impl PartialEq<Token> for TokenWithLocation {
-    fn eq(&self, other: &Token) -> bool {
-        &self.token == other
-    }
-}
+// impl PartialEq<Token> for TokenWithLocation {
+//     fn eq(&self, other: &Token) -> bool {
+//         &self.token == other
+//     }
+// }
 
-impl PartialEq<TokenWithLocation> for Token {
-    fn eq(&self, other: &TokenWithLocation) -> bool {
-        self == &other.token
-    }
-}
+// impl PartialEq<TokenWithLocation> for Token {
+//     fn eq(&self, other: &TokenWithLocation) -> bool {
+//         self == &other.token
+//     }
+// }
 
 impl fmt::Display for TokenWithLocation {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

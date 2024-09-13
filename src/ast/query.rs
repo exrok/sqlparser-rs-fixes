@@ -1574,7 +1574,7 @@ impl fmt::Display for TableFactor {
                     f,
                     "{table} PIVOT({} FOR {} IN ({value_source})",
                     display_comma_separated(aggregate_functions),
-                    Expr::CompoundIdentifier(value_column.to_vec()),
+                    display_separated(value_column, ".")
                 )?;
                 if let Some(expr) = default_on_null {
                     write!(f, " DEFAULT ON NULL ({expr})")?;
