@@ -495,7 +495,34 @@ impl<'a> Parser<'a> {
     /// stopping before the statement separator, if any.
     #[cfg(not(feature = "full-ast"))]
     pub fn parse_statement(&mut self) -> Result<Statement, ParserError> {
-        Err(ParserError::unsupported_statement("statement"))
+        let _guard = stry!(self.recursion_counter.try_decrease());
+
+        // allow the dialect to override statement parsing
+        if let Some(statement) = self.dialect.parse_statement(self) {
+            return statement;
+        }
+
+        let next_token = self.next_token();
+        match &next_token.token {
+            Token::Word(w) => match w.keyword {
+                Keyword::SELECT | Keyword::WITH | Keyword::VALUES => {
+                    self.prev_token();
+                    self.parse_boxed_query().map(Statement::Query)
+                }
+                _ => Err({
+                    let found = next_token;
+                    ParserError::ParserError(format!(
+                        "Unsupported SQL Statement, {}{}",
+                        found.token, found.location
+                    ))
+                }),
+            },
+            Token::LParen => {
+                self.prev_token();
+                self.parse_boxed_query().map(Statement::Query)
+            }
+            _ => expected_error!("an SQL statement", next_token),
+        }
     }
     #[cfg(feature = "full-ast")]
     pub fn parse_statement(&mut self) -> Result<Statement, ParserError> {
